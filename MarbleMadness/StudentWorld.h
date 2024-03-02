@@ -17,7 +17,7 @@ public:
   virtual int init();
   virtual int move();
   virtual void cleanUp();
-  bool checkIfCanMoveHere(int x, int y);
+  bool checkIfCanMoveHere(int x, int y) const;
 
 private:
 	void updateDisplayText();

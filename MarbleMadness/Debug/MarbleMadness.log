@@ -1,2 +1,10 @@
-﻿  StudentWorld.cpp
+﻿  Actor.cpp
+C:\Nikita\College\CS32\MarbleMadness\MarbleMadness\Actor.cpp(50,55): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
+C:\Nikita\College\CS32\MarbleMadness\MarbleMadness\Actor.cpp(50,46): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
+C:\Nikita\College\CS32\MarbleMadness\MarbleMadness\Actor.cpp(55,55): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
+C:\Nikita\College\CS32\MarbleMadness\MarbleMadness\Actor.cpp(55,46): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
+C:\Nikita\College\CS32\MarbleMadness\MarbleMadness\Actor.cpp(60,54): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
+C:\Nikita\College\CS32\MarbleMadness\MarbleMadness\Actor.cpp(60,43): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
+C:\Nikita\College\CS32\MarbleMadness\MarbleMadness\Actor.cpp(65,54): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
+C:\Nikita\College\CS32\MarbleMadness\MarbleMadness\Actor.cpp(65,43): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
   MarbleMadness.vcxproj -> C:\Nikita\College\CS32\MarbleMadness\Debug\MarbleMadness.exe

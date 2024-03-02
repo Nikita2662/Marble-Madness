@@ -6,66 +6,51 @@
 using namespace std;
 
 Actor::Actor(StudentWorld* ptr, int ID, int x, int y, int startDir)
-	: GraphObject(ID, y, x, startDir), myWorld(ptr)
-{
-	setVisible(true); 
-}
+	: GraphObject(ID, y, x, startDir), myWorld(ptr), alive(true)
+{ setVisible(true); }
 
-Actor::~Actor()
-{}
+Actor::~Actor() {}
 
-StudentWorld* Actor::getWorld()
-{
-	return myWorld;
-}
+StudentWorld* Actor::getWorld() const { return myWorld; }
+
+bool Actor::isAlive() const { return alive; }
+
+void Actor::setDead() { alive = false; }
 
 Wall::Wall(int x, int y, StudentWorld* ptr)
 	: Actor(ptr, IID_WALL, x, y)
 {
-	setVisible(true);
 	// dummy - ADD!
 }
 
-void Wall::doSomething()
-{};
+void Wall::doSomething() {};
 
-bool Wall::canMoveHere()
-{
-	return false;
-}
+bool Wall::canMoveHere() const { return false; }
 
 Avator::Avator(int x, int y, StudentWorld* ptr)
-	: Actor(ptr, IID_PLAYER, x, y, right)
+	: Actor(ptr, IID_PLAYER, x, y, right), hitPoints(20), numPeas(20)
 {
-	hitPoints = 20;
-	numPeas = 20;
-
-	setVisible(true);
 	// dummy - ADD!
 }
 
-int Avator::getHealth()
-{
-	return 100 * (hitPoints / 20); // health percentage
-}
+// health percentage
+int Avator::getHealth() const { return 100 * (hitPoints / 20); }
 
-int Avator::getAmmo()
-{
-	return numPeas;
-}
+int Avator::getAmmo() const { return numPeas; }
 
-bool Avator::canMoveHere()
-{
-	return true; // doesn't really make sense - can avator move to where it already is
-}
+bool Avator::canMoveHere() const { return true; } // doesn't really make sense - can avator move to where it already is
 
 void Avator::doSomething()
 {
+	if (!isAlive()) return;
+
 	int ch;
 	if (getWorld()->getKey(ch)) // user did hit a key
 	{
 		switch (ch)
 		{
+		case KEY_PRESS_ESCAPE:
+			setDead();
 		case KEY_PRESS_LEFT:
 			setDirection(left);
 			if (getWorld()->checkIfCanMoveHere(getX() - 1, getY()))

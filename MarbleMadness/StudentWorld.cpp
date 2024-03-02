@@ -25,7 +25,7 @@ StudentWorld::~StudentWorld()
     cleanUp();
 }
 
-bool StudentWorld::checkIfCanMoveHere(int x, int y)
+bool StudentWorld::checkIfCanMoveHere(int x, int y) const
 {
     for (size_t i = 0; i < actors.size(); i++) // iterate through actors by index
     {
@@ -131,9 +131,13 @@ int StudentWorld::move()
 
     for (size_t i = 0; i < actors.size(); i++) // iterate through actors by index
     {
-        actors[i]->doSomething();
-        player->doSomething();
-        // ADD HERE!
+        if (actors[i]->isAlive())
+        {
+            actors[i]->doSomething();
+            player->doSomething();
+            
+            if (!player->isAlive())
+        }  
     }
 
     if (bonus > 0) bonus--; // decrements by 1 unless already 0
