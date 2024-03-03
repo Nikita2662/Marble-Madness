@@ -161,9 +161,20 @@ Pea::Pea(int x, int y, StudentWorld* ptr, int dir)
 
 void Pea::doSomething()
 {
+	// check if alive
 	if (!isAlive()) return;
 
-	getWorld()->tryToDamageLocationOrNext(this, getX(), getY());
+	// returns false meaning Pea did not damage, continued
+	if (!getWorld()->tryToDamageLocation(this, getX(), getY())) 
+	{
+		if (getDirection() == left) moveTo(getX() - 1, getY());
+		else if (getDirection() == right) moveTo(getX() + 1, getY());
+		else if (getDirection() == up) moveTo(getX(), getY() + 1);
+		else if (getDirection() == down) moveTo(getX(), getY() - 1);
+		else cerr << "Pea's direction is none, cannot move it";
+
+		getWorld()->tryToDamageLocation(this, getX(), getY());
+	}
 }
 
 bool Pea::allowsAgentColocationBy(Actor* a) const { return true; }

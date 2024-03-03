@@ -58,9 +58,8 @@ bool StudentWorld::allowsMarble(int x, int y) const
 }
 
   // pea will call this to try to damage any objects at its current location
-bool StudentWorld::tryToDamageLocationOrNext(Actor* a, int peaX, int peaY, int n)
+bool StudentWorld::tryToDamageLocation(Actor* a, int peaX, int peaY)
 {
-    cout << n;
     bool done = false;
 
     for (size_t i = 0; i < actors.size(); i++) { // iterate through actors by index
@@ -68,26 +67,15 @@ bool StudentWorld::tryToDamageLocationOrNext(Actor* a, int peaX, int peaY, int n
             if (actors[i]->isHittable()) { // Marble, Robot, Player, Wall, RobotFactory return true
                 actors[i]->damageBy(2);
                 done = true;
-                a->setVisible(true);
             }
         }
     }
+
     if (done == true)  {
-        a->setDead(); // now because want to ensure robot + factory can both be attacked, but that pea is visible until now
+        a->setDead(); 
         return true; // p is dead, cannot continue, damage complete
     }
-
-    // if pea on same square as nonhittable object, or no object: move in original direction
-    if (n >= 1) {
-        if (a->getDirection() == a->left) a->moveTo(peaX - 1, peaY);
-        else if (a->getDirection() == a->right) a->moveTo(peaX + 1, peaY);
-        else if (a->getDirection() == a->up) a->moveTo(peaX, peaY + 1);
-        else if (a->getDirection() == a->down) a->moveTo(peaX, peaY - 1);
-        else cerr << "Pea's direction is none, cannot move it";
-
-        return tryToDamageLocationOrNext(a, a->getX(), a->getY(), n--); // at most 1 recursive call - n will be 0
-    }
-    return false; // pea is continuing, no damage done
+    return false; // pea should continue, no damage done
 }
 
   // update score/lives/level text at screen time

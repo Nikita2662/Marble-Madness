@@ -27,7 +27,7 @@ public:
 	  // assuming not avator, adds actor to array
 	void addActor(Actor* a);
 	  // pea will call this to try to damage any objects at its current location
-	bool tryToDamageLocationOrNext(Actor* a, int x, int y, int n=1);
+	bool tryToDamageLocation(Actor* a, int x, int y);
 
 private:
 	  // update score/lives/level text at screen time
