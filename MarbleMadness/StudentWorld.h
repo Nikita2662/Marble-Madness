@@ -19,7 +19,9 @@ public:
 	virtual int move();
 	virtual void cleanUp();
 	  // check if the provided Actor can move to the provided position
-	bool checkIfCanMoveHere(int x, int y, Actor* a) const;
+	bool canAgentMoveHere(int x, int y, Actor* a) const;
+	  // check if a marble could move here - only if Empty or Pit
+	bool canMarbleMoveHere(int x, int y) const;
 	  // assuming not avator, adds actor to array
 	void addActor(Actor* a);
 

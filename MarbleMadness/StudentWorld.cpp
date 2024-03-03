@@ -20,7 +20,7 @@ StudentWorld::~StudentWorld() { cleanUp(); }
 void StudentWorld::addActor(Actor* a) { actors.push_back(a);  }
 
   // check if the provided Actor can move to the provided position
-bool StudentWorld::checkIfCanMoveHere(int x, int y, Actor* a) const
+bool StudentWorld::canAgentMoveHere(int x, int y, Actor* a) const
 {
     for (size_t i = 0; i < actors.size(); i++) // iterate through actors by index
     {
@@ -28,6 +28,16 @@ bool StudentWorld::checkIfCanMoveHere(int x, int y, Actor* a) const
             return actors[i]->allowsColocationBy(a);
     }
     return true; // assuming valid index, this just means it's empty
+}
+
+bool StudentWorld::canMarbleMoveHere(int x, int y) const
+{
+    for (size_t i = 0; i < actors.size(); i++) // iterate through actors by index
+    {
+        if (actors[i]->getX() == x && actors[i]->getY() == y) // if there is an actor at this position
+            return actors[i]->canBePushedByMarble(); // will only return true for Pit
+    }
+    return true; // empty at this position
 }
 
   // update score/lives/level text at screen time
@@ -94,13 +104,18 @@ int StudentWorld::init()
                 addActor(player);
                 break;
             }
+            case Level::marble:
+            {
+                Marble* w = new Marble(i, j, this);
+                addActor(w);
+                break;
+            }
             case Level::exit:
             case Level::horiz_ragebot:
             case Level::vert_ragebot:
             case Level::thiefbot_factory:
             case Level::mean_thiefbot_factory:
             case Level::ammo:
-            case Level::marble:
             case Level::pit:
             case Level::crystal:
             case Level::restore_health:
@@ -124,7 +139,7 @@ int StudentWorld::move()
 {
     updateDisplayText(); // update game's status line
 
-    for (size_t i = 0; i < actors.size(); i++) // iterate through actors by index
+    for (size_t i = 0; i < actors.size(); i++) // iterate through actors by index i
     {
         if (actors[i]->isAlive())
         {
@@ -136,14 +151,28 @@ int StudentWorld::move()
             // ADD HERE
         }  
     }
+    // remove newly-dead actors after each tick
+    for (vector<Actor*>::iterator p = actors.begin(); p != actors.end(); )
+    {
+        if (!(*p)->isAlive()) // if dead (p is iterator to an Actor pointer)
+        {
+            delete* p; // delete the Actor that the pointer points to
+            p = actors.erase(p); // normal erase process since no more objects need to be destructed
+        }
+        else
+            p++; // skip this object
+    }
 
-    if (bonus > 0) bonus--; // decrements by 1 unless already 0
+    // reduce current bonus for level by 1 unless already 0
+    if (bonus > 0) bonus--; 
     
 	return GWSTATUS_CONTINUE_GAME;
 }
 
 void StudentWorld::cleanUp()
 {
-    for (size_t i = 0; i < actors.size(); i++) // iterate through actors by index
-        delete actors[i]; // destroy each active Actor we have stored, incl. player
+    for (vector<Actor*>::iterator p = actors.begin(); p != actors.end(); ) {
+       delete* p; // delete the Actor that the pointer points to
+       p = actors.erase(p); // normal erase process since no more objects need to be destructed
+    }
 }

@@ -7,7 +7,7 @@ using namespace std;
 
 //////////////////////////// ACTOR CLASS /////////////////////////
 Actor::Actor(StudentWorld* ptr, int ID, int x, int y, int startDir)
-	: GraphObject(ID, y, x, startDir), myWorld(ptr), alive(true)
+	: GraphObject(ID, y, x, startDir), myWorld(ptr), alive(true), hitPoints(-1)
 { setVisible(true); }
 
 Actor::~Actor() {}
@@ -15,38 +15,37 @@ Actor::~Actor() {}
 StudentWorld* Actor::getWorld() const { return myWorld; }
 
 bool Actor::isAlive() const { return alive; }
-
 void Actor::setDead() { alive = false; }
+void Actor::setHP(int amt) { hitPoints = amt; }
+int Actor::getHP() const { return hitPoints; }
+bool Actor::canBePushedByMarble() { return false; }
 //////////////////////////// ACTOR CLASS /////////////////////////
 
 //////////////////////////// WALL CLASS /////////////////////////
 Wall::Wall(int x, int y, StudentWorld* ptr)
 	: Actor(ptr, IID_WALL, x, y)
-{
-	// dummy - ADD!
-}
+{}
 
-void Wall::doSomething() {};
+void Wall::doSomething() {}
 
 bool Wall::allowsColocationBy(Actor* a) const { return false; }
 
-  // returns if Actor can be damaged by pea
+  // returns if Wall can be damaged by pea
 bool Wall::isDamageable() const { return false; }
 
-  // when attacked by pea, suffer damage
-void Wall::damageBy(int damageAmt)
-{}
+  // when attacked by pea, suffer damage (here, none)
+void Wall::damageBy(int damageAmt) {}
 //////////////////////////// WALL CLASS /////////////////////////
 
 //////////////////////////// AVATOR CLASS /////////////////////////
 Avator::Avator(int x, int y, StudentWorld* ptr)
-	: Actor(ptr, IID_PLAYER, x, y, right), hitPoints(20), numPeas(20)
+	: Actor(ptr, IID_PLAYER, x, y, right), numPeas(20)
 {
-	// dummy - ADD!
+	setHP(20);
 }
 
 // health percentage
-int Avator::getHealth() const { return 100 * (hitPoints / 20); }
+int Avator::getHealth() const { return 100 * (getHP() / 20); }
 
 int Avator::getAmmo() const { return numPeas; }
 
@@ -58,19 +57,19 @@ bool Avator::allowsColocationBy(Actor* a) const
 // move to the adjacent square in the direction avator currently faces, if not blocked
 bool Avator::moveIfPossible()
 {
-	if (getDirection() == left && getWorld()->checkIfCanMoveHere(getX() - 1, getY(), this)) {
+	if (getDirection() == left && getWorld()->canAgentMoveHere(getX() - 1, getY(), this)) {
 		moveTo(getX() - 1, getY()); // move 1 square to the left
 		return true;
 	}
-	else if (getDirection() == right && getWorld()->checkIfCanMoveHere(getX() + 1, getY(), this)) {
+	else if (getDirection() == right && getWorld()->canAgentMoveHere(getX() + 1, getY(), this)) {
 		moveTo(getX() + 1, getY()); // move 1 square to the right
 		return true;
 	}
-	else if (getDirection() == up && getWorld()->checkIfCanMoveHere(getX(), getY() + 1, this)) {
+	else if (getDirection() == up && getWorld()->canAgentMoveHere(getX(), getY() + 1, this)) {
 		moveTo(getX(), getY() + 1); // move 1 square up
 		return true;
 	}
-	else if (getDirection() == down && getWorld()->checkIfCanMoveHere(getX(), getY() - 1, this)) {
+	else if (getDirection() == down && getWorld()->canAgentMoveHere(getX(), getY() - 1, this)) {
 		moveTo(getX(), getY() - 1); // move 1 square down
 		return true;
 	}
@@ -140,8 +139,8 @@ bool Avator::isDamageable() const { return true; }
   // when attacked by pea, suffer damage
 void Avator::damageBy(int damageAmt) 
 { 
-	hitPoints -= damageAmt; 
-	if (hitPoints > 0)
+	setHP(getHP() - damageAmt);
+	if (getHP() > 0)
 		getWorld()->playSound(SOUND_PLAYER_IMPACT);
 	else {
 		setDead();
@@ -165,12 +164,51 @@ bool Pea::allowsColocationBy(Actor* a) const
 	return true; // EDIT AS NEEDED BY PEA SPEC
 }
 
-// returns if Actor can be damaged by pea
+  // returns if Actor can be damaged by pea
 bool Pea::isDamageable() const { return true; }
 
-// when attacked by pea, suffer damage
+  // when attacked by pea, suffer damage
 void Pea::damageBy(int damageAmt)
 {
-
+	// ADD
 }
 //////////////////////////// PEA CLASS /////////////////////////
+
+//////////////////////////// MARBLE CLASS /////////////////////////
+Marble::Marble(int x, int y, StudentWorld* ptr)
+	: Actor(ptr, IID_MARBLE, x, y)
+{
+	setHP(10);
+}
+
+void Marble::doSomething() {}
+
+bool Marble::allowsColocationBy(Actor* a) const
+{
+	return true; // THIS IS WRONG, FIX
+}
+
+  // returns if Marble can be damaged by pea
+bool Marble::isDamageable() const { return true; }
+
+  // when attacked by pea, suffer damage
+void Marble::damageBy(int damageAmt)
+{
+	setHP(getHP() - damageAmt);
+	if (getHP() <= 0)
+		setDead();
+}
+
+  // avator pushes Marble to given position if possible, returns false otherwise
+bool Marble::pushTo(int x, int y)
+{
+	if (getWorld()->canMarbleMoveHere(x, y)) {
+		moveTo(x, y);
+		return true; // marble was moved
+	}
+	return false; // marble could not be moved
+}
+
+//////////////////////////// MARBLE CLASS /////////////////////////
+
+
