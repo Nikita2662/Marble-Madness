@@ -17,7 +17,9 @@ public:
 	virtual ~Actor();
 	virtual void doSomething() = 0; // contains nothing rn
 	virtual bool canBePushedByMarble();
-	virtual bool allowsColocationBy(Actor* a) const = 0;
+	  // returns if this kind of Actor could possibly be pushed by an Avator (only true for marble)
+	virtual bool mayBePushedByPlayer();
+	virtual bool allowsAgentColocationBy(Actor* a) const = 0;
 	  // returns if Actor can be damaged by pea
 	virtual bool isDamageable() const = 0;
 	  // when attacked by pea, suffer damage
@@ -33,7 +35,7 @@ class Wall : public Actor
 public:
 	Wall(int x, int y, StudentWorld* ptr); // contains nothing rn
 	virtual void doSomething();
-	virtual bool allowsColocationBy(Actor* a) const;
+	virtual bool allowsAgentColocationBy(Actor* a) const;
 		// returns if Wall can be damaged by pea
 	virtual bool isDamageable() const;
 		// when attacked by pea, suffer damage
@@ -49,7 +51,7 @@ public:
 	int getAmmo() const;
 	bool moveIfPossible();
 	virtual void doSomething();
-	virtual bool allowsColocationBy(Actor* a) const;
+	virtual bool allowsAgentColocationBy(Actor* a) const;
 	  // returns if Avator can be damaged by pea
 	virtual bool isDamageable() const;
 	  // when attacked by pea, suffer damage
@@ -64,7 +66,7 @@ class Pea : public Actor
 public:
 	Pea(int x, int y, StudentWorld* ptr, int dir);
 	virtual void doSomething(); // empty rn
-	virtual bool allowsColocationBy(Actor* a) const; // default rn
+	virtual bool allowsAgentColocationBy(Actor* a) const; // default rn
 	  // returns if Actor can be damaged by pea
 	virtual bool isDamageable() const;
 	  // when attacked by pea, suffer damage
@@ -77,7 +79,9 @@ class Marble : public Actor
 public:
 	Marble(int x, int y, StudentWorld* ptr);
 	virtual void doSomething(); // contains nothing rn
-	virtual bool allowsColocationBy(Actor* a) const;
+	  // avator may push a marble object (depending on position)
+	virtual bool mayBePushedByPlayer();
+	virtual bool allowsAgentColocationBy(Actor* a) const;
 	  // returns if Marble can be damaged by pea
 	virtual bool isDamageable() const;
 	  // when attacked by pea, suffer damage

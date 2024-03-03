@@ -25,7 +25,7 @@ bool StudentWorld::canAgentMoveHere(int x, int y, Actor* a) const
     for (size_t i = 0; i < actors.size(); i++) // iterate through actors by index
     {
         if (actors[i]->getX() == x && actors[i]->getY() == y)
-            return actors[i]->allowsColocationBy(a);
+            return actors[i]->allowsAgentColocationBy(a);
     }
     return true; // assuming valid index, this just means it's empty
 }
@@ -121,12 +121,6 @@ int StudentWorld::init()
             case Level::restore_health:
             case Level::extra_life:
                 break;
-            /* case Level::exit:
-            {
-                ...
-            }
-            ........
-            */
             default:
                 cerr << "Invalid entry in maze text file";
             }

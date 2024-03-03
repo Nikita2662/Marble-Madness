@@ -19,6 +19,7 @@ void Actor::setDead() { alive = false; }
 void Actor::setHP(int amt) { hitPoints = amt; }
 int Actor::getHP() const { return hitPoints; }
 bool Actor::canBePushedByMarble() { return false; }
+bool Actor::mayBePushedByPlayer() { return false; }
 //////////////////////////// ACTOR CLASS /////////////////////////
 
 //////////////////////////// WALL CLASS /////////////////////////
@@ -28,7 +29,7 @@ Wall::Wall(int x, int y, StudentWorld* ptr)
 
 void Wall::doSomething() {}
 
-bool Wall::allowsColocationBy(Actor* a) const { return false; }
+bool Wall::allowsAgentColocationBy(Actor* a) const { return false; }
 
   // returns if Wall can be damaged by pea
 bool Wall::isDamageable() const { return false; }
@@ -49,7 +50,7 @@ int Avator::getHealth() const { return 100 * (getHP() / 20); }
 
 int Avator::getAmmo() const { return numPeas; }
 
-bool Avator::allowsColocationBy(Actor* a) const 
+bool Avator::allowsAgentColocationBy(Actor* a) const 
 {
 	return true; // EDIT
 } 
@@ -159,7 +160,7 @@ void Pea::doSomething()
 	// ADD
 }
 
-bool Pea::allowsColocationBy(Actor* a) const
+bool Pea::allowsAgentColocationBy(Actor* a) const
 {
 	return true; // EDIT AS NEEDED BY PEA SPEC
 }
@@ -183,9 +184,12 @@ Marble::Marble(int x, int y, StudentWorld* ptr)
 
 void Marble::doSomething() {}
 
-bool Marble::allowsColocationBy(Actor* a) const
+  // avator may push a marble object (depending on position)
+bool Marble::mayBePushedByPlayer() { return true; }
+
+bool Marble::allowsAgentColocationBy(Actor* a) const
 {
-	return true; // THIS IS WRONG, FIX
+	return false; // THIS IS WRONG, FIX
 }
 
   // returns if Marble can be damaged by pea

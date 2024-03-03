@@ -1,14 +1,14 @@
 ﻿  Actor.cpp
-C:\Nikita\College\CS32\MarbleMadness\MarbleMadness\Actor.cpp(60,77): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
-C:\Nikita\College\CS32\MarbleMadness\MarbleMadness\Actor.cpp(60,68): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
-C:\Nikita\College\CS32\MarbleMadness\MarbleMadness\Actor.cpp(64,83): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
-C:\Nikita\College\CS32\MarbleMadness\MarbleMadness\Actor.cpp(64,74): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
-C:\Nikita\College\CS32\MarbleMadness\MarbleMadness\Actor.cpp(68,79): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
-C:\Nikita\College\CS32\MarbleMadness\MarbleMadness\Actor.cpp(68,68): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
-C:\Nikita\College\CS32\MarbleMadness\MarbleMadness\Actor.cpp(72,81): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
-C:\Nikita\College\CS32\MarbleMadness\MarbleMadness\Actor.cpp(72,70): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
-C:\Nikita\College\CS32\MarbleMadness\MarbleMadness\Actor.cpp(94,34): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
-C:\Nikita\College\CS32\MarbleMadness\MarbleMadness\Actor.cpp(94,26): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
+C:\Nikita\College\CS32\MarbleMadness\MarbleMadness\Actor.cpp(61,77): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
+C:\Nikita\College\CS32\MarbleMadness\MarbleMadness\Actor.cpp(61,68): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
+C:\Nikita\College\CS32\MarbleMadness\MarbleMadness\Actor.cpp(65,83): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
+C:\Nikita\College\CS32\MarbleMadness\MarbleMadness\Actor.cpp(65,74): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
+C:\Nikita\College\CS32\MarbleMadness\MarbleMadness\Actor.cpp(69,79): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
+C:\Nikita\College\CS32\MarbleMadness\MarbleMadness\Actor.cpp(69,68): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
+C:\Nikita\College\CS32\MarbleMadness\MarbleMadness\Actor.cpp(73,81): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
+C:\Nikita\College\CS32\MarbleMadness\MarbleMadness\Actor.cpp(73,70): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
+C:\Nikita\College\CS32\MarbleMadness\MarbleMadness\Actor.cpp(95,34): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
+C:\Nikita\College\CS32\MarbleMadness\MarbleMadness\Actor.cpp(95,26): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
   StudentWorld.cpp
   Generating Code...
   MarbleMadness.vcxproj -> C:\Nikita\College\CS32\MarbleMadness\Debug\MarbleMadness.exe
