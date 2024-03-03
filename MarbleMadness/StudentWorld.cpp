@@ -20,24 +20,41 @@ StudentWorld::~StudentWorld() { cleanUp(); }
 void StudentWorld::addActor(Actor* a) { actors.push_back(a);  }
 
   // check if the provided Actor can move to the provided position
-bool StudentWorld::canAgentMoveHere(int x, int y, Actor* a) const
+bool StudentWorld::canActorMoveHere(Actor* a, int x, int y) const
 {
-    for (size_t i = 0; i < actors.size(); i++) // iterate through actors by index
-    {
-        if (actors[i]->getX() == x && actors[i]->getY() == y)
-            return actors[i]->allowsAgentColocationBy(a);
+    for (size_t i = 0; i < actors.size(); i++) { // iterate through actors by index
+        if (actors[i]->getX() == x && actors[i]->getY() == y) // if there is an actor at this position
+        {
+            if (actors[i]->mayBePushedByPlayer()) { // if trying to move to Marble-occupied square
+                // find x,y of adjacent square to Marble in direction player is moving
+                int xm = actors[i]->getX();
+                int ym = actors[i]->getY();
+
+                if (a->getDirection() == a->left) xm--;
+                else if (a->getDirection() == a->right) xm++;
+                else if (a->getDirection() == a->up) ym++;
+                else if (a->getDirection() == a->down) ym--;
+                else cerr << "Actor's direction is none, cannot push marble";
+
+                // move marble to this position if possible, return false otherwise.
+                return actors[i]->pushTo(xm, ym);
+            }
+            else // if trying to move to a non-Marble-occupied square
+                return actors[i]->allowsAgentColocationBy(a);
+        }
     }
     return true; // assuming valid index, this just means it's empty
 }
 
-bool StudentWorld::canMarbleMoveHere(int x, int y) const
+  // returns true if a marble may be pushed to this position 
+  // (assume provided position adjacent to marble in direction the player faces)
+bool StudentWorld::allowsMarble(int x, int y) const
 {
-    for (size_t i = 0; i < actors.size(); i++) // iterate through actors by index
-    {
-        if (actors[i]->getX() == x && actors[i]->getY() == y) // if there is an actor at this position
-            return actors[i]->canBePushedByMarble(); // will only return true for Pit
+    for (size_t i = 0; i < actors.size(); i++) { // iterate through actors by index
+        if (actors[i]->getX() == x && actors[i]->getY() == y)
+            return actors[i]->canContainMarblePush(); // will only return true for Pit
     }
-    return true; // empty at this position
+    return true; // if Empty at this position
 }
 
   // update score/lives/level text at screen time

@@ -18,8 +18,12 @@ bool Actor::isAlive() const { return alive; }
 void Actor::setDead() { alive = false; }
 void Actor::setHP(int amt) { hitPoints = amt; }
 int Actor::getHP() const { return hitPoints; }
-bool Actor::canBePushedByMarble() { return false; }
+  // only returns true for Pit or Empty
+bool Actor::canContainMarblePush() { return false; }
+  // returns if this kind of Actor could possibly be pushed by an Avator (only true for marble)
 bool Actor::mayBePushedByPlayer() { return false; }
+  // only allowed for Marbles
+bool Actor::pushTo(int x, int y) { return false; }
 //////////////////////////// ACTOR CLASS /////////////////////////
 
 //////////////////////////// WALL CLASS /////////////////////////
@@ -58,22 +62,22 @@ bool Avator::allowsAgentColocationBy(Actor* a) const
 // move to the adjacent square in the direction avator currently faces, if not blocked
 bool Avator::moveIfPossible()
 {
-	if (getDirection() == left && getWorld()->canAgentMoveHere(getX() - 1, getY(), this)) {
-		moveTo(getX() - 1, getY()); // move 1 square to the left
-		return true;
-	}
-	else if (getDirection() == right && getWorld()->canAgentMoveHere(getX() + 1, getY(), this)) {
-		moveTo(getX() + 1, getY()); // move 1 square to the right
-		return true;
-	}
-	else if (getDirection() == up && getWorld()->canAgentMoveHere(getX(), getY() + 1, this)) {
-		moveTo(getX(), getY() + 1); // move 1 square up
-		return true;
-	}
-	else if (getDirection() == down && getWorld()->canAgentMoveHere(getX(), getY() - 1, this)) {
-		moveTo(getX(), getY() - 1); // move 1 square down
-		return true;
-	}
+	if (getDirection() == left && getWorld()->canActorMoveHere(this, getX() - 1, getY())) {
+			moveTo(getX() - 1, getY()); // move player 1 square to the left
+			return true;
+		}
+	else if (getDirection() == right && getWorld()->canActorMoveHere(this, getX() + 1, getY())) {
+			moveTo(getX() + 1, getY()); // move player 1 square to the right
+			return true;
+		}
+	else if (getDirection() == up && getWorld()->canActorMoveHere(this, getX(), getY() + 1)) {
+			moveTo(getX(), getY() + 1); // move player 1 square up
+			return true;
+		}
+	else if (getDirection() == down && getWorld()->canActorMoveHere(this, getX(), getY() - 1)) {
+			moveTo(getX(), getY() - 1); // move player 1 square down
+			return true;
+		}
 	return false; // invalid direction or blocked --> did not move 
 }
 
@@ -189,7 +193,7 @@ bool Marble::mayBePushedByPlayer() { return true; }
 
 bool Marble::allowsAgentColocationBy(Actor* a) const
 {
-	return false; // THIS IS WRONG, FIX
+	return false; // not categorically, but depends on position
 }
 
   // returns if Marble can be damaged by pea
@@ -206,7 +210,7 @@ void Marble::damageBy(int damageAmt)
   // avator pushes Marble to given position if possible, returns false otherwise
 bool Marble::pushTo(int x, int y)
 {
-	if (getWorld()->canMarbleMoveHere(x, y)) {
+	if (getWorld()->allowsMarble(x, y)) {
 		moveTo(x, y);
 		return true; // marble was moved
 	}

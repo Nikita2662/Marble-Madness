@@ -18,10 +18,12 @@ public:
 	virtual int init();
 	virtual int move();
 	virtual void cleanUp();
-	  // check if the provided Actor can move to the provided position
-	bool canAgentMoveHere(int x, int y, Actor* a) const;
+	  // check if the provided Actor can move to the provided position 
+	  // if Actor is marble, only allows movement to Pit or Empty
+	  // if Actor is agent, movement allowed anywhere but wall, pit, robot, or robotfactory
+	bool canActorMoveHere(Actor* a, int x, int y) const;
 	  // check if a marble could move here - only if Empty or Pit
-	bool canMarbleMoveHere(int x, int y) const;
+	bool allowsMarble(int x, int y) const;
 	  // assuming not avator, adds actor to array
 	void addActor(Actor* a);
 

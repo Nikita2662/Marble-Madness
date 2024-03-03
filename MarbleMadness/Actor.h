@@ -16,9 +16,12 @@ public:
 	StudentWorld* getWorld() const;
 	virtual ~Actor();
 	virtual void doSomething() = 0; // contains nothing rn
-	virtual bool canBePushedByMarble();
+	  // only returns true for Pit or Empty
+	virtual bool canContainMarblePush();
 	  // returns if this kind of Actor could possibly be pushed by an Avator (only true for marble)
 	virtual bool mayBePushedByPlayer();
+	  // avator pushes Marble to given position if possible, returns false otherwise
+	virtual bool pushTo(int x, int y);
 	virtual bool allowsAgentColocationBy(Actor* a) const = 0;
 	  // returns if Actor can be damaged by pea
 	virtual bool isDamageable() const = 0;
