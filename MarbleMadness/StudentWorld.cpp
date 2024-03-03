@@ -78,6 +78,15 @@ bool StudentWorld::tryToDamageLocation(Actor* a, int peaX, int peaY)
     return false; // pea should continue, no damage done
 }
 
+  // returns if marble is on the same square as a pit
+Actor* StudentWorld::isMarbleHere(Actor* a, int pitX, int pitY)
+{
+    for (size_t i = 0; i < actors.size(); i++) // iterate through actors by index
+        if (actors[i]->getX() == pitX && actors[i]->getY() == pitY && actors[i]->mayBePushedByPlayer())
+            return actors[i];
+    return nullptr;
+}
+
   // update score/lives/level text at screen time
 void StudentWorld::updateDisplayText()
 {
@@ -148,13 +157,18 @@ int StudentWorld::init()
                 addActor(w);
                 break;
             }
+            case Level::pit:
+            {
+                Pit* p = new Pit(i, j, this);
+                addActor(p);
+                break;
+            }
             case Level::exit:
             case Level::horiz_ragebot:
             case Level::vert_ragebot:
             case Level::thiefbot_factory:
             case Level::mean_thiefbot_factory:
             case Level::ammo:
-            case Level::pit:
             case Level::crystal:
             case Level::restore_health:
             case Level::extra_life:

@@ -94,4 +94,19 @@ public:
 private:
 };
 
+class Pit : public Actor
+{
+public:
+	Pit(int x, int y, StudentWorld* ptr);
+	virtual void doSomething();
+	  // only returns true for Pit or Empty
+	virtual bool canContainMarblePush();
+	virtual bool allowsAgentColocationBy(Actor* a) const;
+	  // returns if Actor can be hit by pea
+	virtual bool isHittable() const;
+	  // when attacked by pea, suffer damage
+	virtual void damageBy(int damageAmt);
+private:
+};
+
 #endif // ACTOR_H_

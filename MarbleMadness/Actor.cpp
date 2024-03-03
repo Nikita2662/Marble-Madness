@@ -226,4 +226,37 @@ bool Marble::pushTo(int x, int y)
 
 //////////////////////////// MARBLE CLASS /////////////////////////
 
+//////////////////////////// PIT CLASS /////////////////////////
+Pit::Pit(int x, int y, StudentWorld* ptr)
+	: Actor(ptr, IID_PIT, x, y)
+{}
+
+
+void Pit::doSomething()
+{
+	if (!isAlive()) return;
+
+	Actor* ptr = getWorld()->isMarbleHere(this, getX(), getY());
+
+	if (ptr != nullptr)
+	{
+		setDead();
+		ptr->setDead();
+	}
+}
+
+  // only returns true for Pit or Empty
+bool Pit::canContainMarblePush() { return true; }
+
+bool Pit::allowsAgentColocationBy(Actor* a) const
+{
+	return true; // CHANGE - just for marble and pea? any others?
+}
+
+  // returns if Pit can be hit by pea
+bool Pit::isHittable() const { return false; }
+
+  // when attacked by pea, suffer no damage
+void Pit::damageBy(int damageAmt) {};
+//////////////////////////// PIT CLASS /////////////////////////
 
