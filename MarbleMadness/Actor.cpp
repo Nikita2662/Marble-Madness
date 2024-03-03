@@ -29,6 +29,13 @@ Wall::Wall(int x, int y, StudentWorld* ptr)
 void Wall::doSomething() {};
 
 bool Wall::allowsColocationBy(Actor* a) const { return false; }
+
+  // returns if Actor can be damaged by pea
+bool Wall::isDamageable() const { return false; }
+
+  // when attacked by pea, suffer damage
+void Wall::damageBy(int damageAmt)
+{}
 //////////////////////////// WALL CLASS /////////////////////////
 
 //////////////////////////// AVATOR CLASS /////////////////////////
@@ -84,16 +91,21 @@ void Avator::doSomething()
 			break;
 		case KEY_PRESS_SPACE:
 			if (numPeas > 0) {
-				// get x and y of where pea should be fired
-				int x = getX();
-				int y = getY();
-				if (getDirection() == left) x--;
-				else if (getDirection() == right) x++;
-				else if (getDirection() == up) y++;
-				else if (getDirection() == down) y--;
-				else cerr << "Player's direction is none, cannot fire pea";
+				// create new pea with temp location of player
+				Pea* p = new Pea(getX(), getY(), getWorld(), getDirection());
 
-				Pea* p = new Pea(x, y, getWorld(), getDirection()); // create new Pea
+				// adjust position to directly in front of player
+				if (getDirection() == left) 
+					p->moveTo(getX() - 1, getY());
+				else if (getDirection() == right) 
+					p->moveTo(getX() + 1, getY());
+				else if (getDirection() == up) 
+					p->moveTo(getX(), getY() + 1);
+				else if (getDirection() == down) 
+					p->moveTo(getX(), getY() - 1);
+				else 
+					cerr << "Player's direction is none, cannot fire pea";
+
 				getWorld()->addActor(p); // add to actors array
 				getWorld()->playSound(SOUND_PLAYER_FIRE); // sound
 				numPeas--; // decrement
@@ -121,6 +133,21 @@ void Avator::doSomething()
 		}
 	}
 };
+
+  // returns if Actor can be damaged by pea
+bool Avator::isDamageable() const { return true; }
+
+  // when attacked by pea, suffer damage
+void Avator::damageBy(int damageAmt) 
+{ 
+	hitPoints -= damageAmt; 
+	if (hitPoints > 0)
+		getWorld()->playSound(SOUND_PLAYER_IMPACT);
+	else {
+		setDead();
+		getWorld()->playSound(SOUND_PLAYER_DIE);
+	}
+}
 //////////////////////////// AVATOR CLASS /////////////////////////
 
 //////////////////////////// PEA CLASS /////////////////////////
@@ -138,4 +165,12 @@ bool Pea::allowsColocationBy(Actor* a) const
 	return true; // EDIT AS NEEDED BY PEA SPEC
 }
 
+// returns if Actor can be damaged by pea
+bool Pea::isDamageable() const { return true; }
+
+// when attacked by pea, suffer damage
+void Pea::damageBy(int damageAmt)
+{
+
+}
 //////////////////////////// PEA CLASS /////////////////////////

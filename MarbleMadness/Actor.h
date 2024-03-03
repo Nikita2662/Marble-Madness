@@ -13,6 +13,10 @@ public:
 	virtual void doSomething() = 0; // contains nothing rn
 	StudentWorld* getWorld() const;
 	virtual bool allowsColocationBy(Actor* a) const = 0;
+	  // returns if Actor can be damaged by pea
+	virtual bool isDamageable() const = 0;
+	  // when attacked by pea, suffer damage
+	virtual void damageBy(int damageAmt) = 0;
 	bool isAlive() const;
 	void setDead();
 private:
@@ -26,7 +30,10 @@ public:
 	Wall(int x, int y, StudentWorld* ptr); // contains nothing rn
 	virtual void doSomething();
 	virtual bool allowsColocationBy(Actor* a) const;
-private:
+		// returns if Wall can be damaged by pea
+	virtual bool isDamageable() const;
+		// when attacked by pea, suffer damage
+	virtual void damageBy(int damageAmt); private:
 };
 
 class Avator : public Actor
@@ -37,7 +44,11 @@ public:
 	int getAmmo() const;
 	virtual void doSomething();
 	virtual bool allowsColocationBy(Actor* a) const;
-	  // move to the adjacent square in the direction avator currently faces, if not blocked
+	  // returns if Avator can be damaged by pea
+	virtual bool isDamageable() const;
+	  // when attacked by pea, suffer damage
+	virtual void damageBy(int damageAmt);
+      // move to the adjacent square in the direction avator currently faces, if not blocked
 	bool moveIfPossible();
 private:
 	int hitPoints;
@@ -50,6 +61,10 @@ public:
 	Pea(int x, int y, StudentWorld* ptr, int dir);
 	virtual void doSomething(); // empty rn
 	virtual bool allowsColocationBy(Actor* a) const; // default rn
+	  // returns if Actor can be damaged by pea
+	virtual bool isDamageable() const;
+	  // when attacked by pea, suffer damage
+	virtual void damageBy(int damageAmt);
 private:
 };
 
