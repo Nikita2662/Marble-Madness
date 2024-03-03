@@ -8,34 +8,47 @@
 #include <iomanip>
 using namespace std;
 
-GameWorld* createStudentWorld(string assetPath)
-{
-	return new StudentWorld(assetPath);
-}
-
-// Students:  Add code to this file, StudentWorld.h, Actor.h, and Actor.cpp
+GameWorld* createStudentWorld(string assetPath) { return new StudentWorld(assetPath); }
 
 StudentWorld::StudentWorld(string assetPath)
     : GameWorld(assetPath), bonus(-1), player(nullptr)
-{
-}
+{}
 
-StudentWorld::~StudentWorld()
-{
-    cleanUp();
-}
+StudentWorld::~StudentWorld() { cleanUp(); }
 
-bool StudentWorld::checkIfCanMoveHere(int x, int y) const
+  // assuming not avator, adds actor to array
+void StudentWorld::addActor(Actor* a) { actors.push_back(a);  }
+
+  // check if the provided Actor can move to the provided position
+bool StudentWorld::checkIfCanMoveHere(int x, int y, Actor* a) const
 {
     for (size_t i = 0; i < actors.size(); i++) // iterate through actors by index
     {
         if (actors[i]->getX() == x && actors[i]->getY() == y)
-            return actors[i]->canMoveHere();
+            return actors[i]->allowsColocationBy(a);
     }
     return true; // assuming valid index, this just means it's empty
 }
 
-// given current level of the GameWorld, loads the maze if possible. populates ACTORS and AVATOR of the game for the current level
+  // update score/lives/level text at screen time
+void StudentWorld::updateDisplayText()
+{
+    ostringstream oss;
+    oss.fill('0'); // leading 0s for score
+    oss << "Score: " << setw(7) << getScore() << "  ";
+    oss << "Level: " << setw(2) << getLevel() << "  ";
+    oss.fill(' ');
+    oss << "Lives: " << setw(2) << getLives() << "  ";
+    oss << "Health: " << setw(3) << player->getHealth() << "%  ";
+    oss << "Ammo: " << setw(3) << player->getAmmo() << "  ";
+    oss << "Bonus: " << setw(4) << bonus << "  ";
+
+    string s = oss.str();
+
+    setGameStatText(s); // update the display text with this string
+}
+
+  // given current level of the GameWorld, loads the maze if possible. populates ACTORS and AVATOR of the game for the current level
 int StudentWorld::init()
 {
     bonus = 1000; // whenever new level starts
@@ -58,7 +71,7 @@ int StudentWorld::init()
         return GWSTATUS_LEVEL_ERROR;
 
     Level::MazeEntry curr;
-    // ------ load was successful, access contents of the level to populate the game world - ACTORS and AVATOR - accordingly
+    // ------ load was successful, access contents of the level to populate the game world - ACTORS - accordingly
     for (int i = 0; i < VIEW_HEIGHT; i++) // iterate through rows
         for (int j = 0; j < VIEW_WIDTH; j++) // iterate through cols
         {
@@ -72,12 +85,13 @@ int StudentWorld::init()
             case Level::wall:
             {
                 Wall* w = new Wall(i, j, this);
-                actors.push_back(w);
+                addActor(w);
                 break;
             }
             case Level::player:
             {
                 player = new Avator(i, j, this);
+                addActor(player);
                 break;
             }
             case Level::exit:
@@ -94,8 +108,7 @@ int StudentWorld::init()
                 break;
             /* case Level::exit:
             {
-                actors.push_back(new .......)
-                break;
+                ...
             }
             ........
             */
@@ -107,24 +120,6 @@ int StudentWorld::init()
     return GWSTATUS_CONTINUE_GAME;
 }
 
-// update score/lives/level text at screen time
-void StudentWorld::updateDisplayText()
-{
-    ostringstream oss;
-    oss.fill('0'); // leading 0s for score
-    oss << "Score: " << setw(7) << getScore() << "  ";
-    oss << "Level: " << setw(2) << getLevel() << "  ";
-    oss.fill(' ');
-    oss << "Lives: " << setw(2) << getLives() << "  ";
-    oss << "Health: " << setw(3) << player->getHealth() << "%  ";
-    oss << "Ammo: " << setw(3) << player->getAmmo() << "  ";
-    oss << "Bonus: " << setw(4) << bonus << "  ";
-
-    string s = oss.str();
-
-    setGameStatText(s); // update the display text with this string
-}
-
 int StudentWorld::move()
 {
     updateDisplayText(); // update game's status line
@@ -134,9 +129,11 @@ int StudentWorld::move()
         if (actors[i]->isAlive())
         {
             actors[i]->doSomething();
-            player->doSomething();
             
-            if (!player->isAlive())
+            if (!player->isAlive()) // if player died during this tick
+                return GWSTATUS_PLAYER_DIED;
+
+            // ADD HERE
         }  
     }
 
@@ -148,9 +145,5 @@ int StudentWorld::move()
 void StudentWorld::cleanUp()
 {
     for (size_t i = 0; i < actors.size(); i++) // iterate through actors by index
-    {
-        delete actors[i]; // destroy each active Actor we have stored
-    }
-
-    delete player;
+        delete actors[i]; // destroy each active Actor we have stored, incl. player
 }

@@ -12,7 +12,7 @@ public:
 	virtual ~Actor();
 	virtual void doSomething() = 0; // contains nothing rn
 	StudentWorld* getWorld() const;
-	virtual bool canMoveHere() const = 0;
+	virtual bool allowsColocationBy(Actor* a) const = 0;
 	bool isAlive() const;
 	void setDead();
 private:
@@ -25,7 +25,7 @@ class Wall : public Actor
 public:
 	Wall(int x, int y, StudentWorld* ptr); // contains nothing rn
 	virtual void doSomething();
-	virtual bool canMoveHere() const;
+	virtual bool allowsColocationBy(Actor* a) const;
 private:
 };
 
@@ -36,10 +36,21 @@ public:
 	int getHealth() const;
 	int getAmmo() const;
 	virtual void doSomething();
-	virtual bool canMoveHere() const;
+	virtual bool allowsColocationBy(Actor* a) const;
+	  // move to the adjacent square in the direction avator currently faces, if not blocked
+	bool moveIfPossible();
 private:
 	int hitPoints;
 	int numPeas;
+};
+
+class Pea : public Actor
+{
+public:
+	Pea(int x, int y, StudentWorld* ptr, int dir);
+	virtual void doSomething(); // empty rn
+	virtual bool allowsColocationBy(Actor* a) const; // default rn
+private:
 };
 
 #endif // ACTOR_H_
