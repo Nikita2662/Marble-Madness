@@ -18,14 +18,16 @@ public:
 	virtual int init();
 	virtual int move();
 	virtual void cleanUp();
-	  // check if the provided Actor can move to the provided position 
-	  // if Actor is marble, only allows movement to Pit or Empty
-	  // if Actor is agent, movement allowed anywhere but wall, pit, robot, or robotfactory
+	  /* check if the provided Actor can move to the provided position
+	     if Actor is marble, only allows movement to Pit or Empty
+	     if Actor is agent, movement allowed anywhere but wall, pit, robot, or robotfactory */
 	bool canActorMoveHere(Actor* a, int x, int y) const;
 	  // check if a marble could move here - only if Empty or Pit
 	bool allowsMarble(int x, int y) const;
 	  // assuming not avator, adds actor to array
 	void addActor(Actor* a);
+	  // pea will call this to try to damage any objects at its current location
+	bool tryToDamageLocationOrNext(Actor* a, int x, int y, int n=1);
 
 private:
 	  // update score/lives/level text at screen time

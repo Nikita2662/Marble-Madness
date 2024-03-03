@@ -35,8 +35,8 @@ void Wall::doSomething() {}
 
 bool Wall::allowsAgentColocationBy(Actor* a) const { return false; }
 
-  // returns if Wall can be damaged by pea
-bool Wall::isDamageable() const { return false; }
+  // returns if Wall can be hit by pea
+bool Wall::isHittable() const { return true; }
 
   // when attacked by pea, suffer damage (here, none)
 void Wall::damageBy(int damageAmt) {}
@@ -138,8 +138,8 @@ void Avator::doSomething()
 	}
 };
 
-  // returns if Actor can be damaged by pea
-bool Avator::isDamageable() const { return true; }
+  // returns if Avator can be hit by pea
+bool Avator::isHittable() const { return true; }
 
   // when attacked by pea, suffer damage
 void Avator::damageBy(int damageAmt) 
@@ -161,22 +161,18 @@ Pea::Pea(int x, int y, StudentWorld* ptr, int dir)
 
 void Pea::doSomething()
 {
-	// ADD
+	if (!isAlive()) return;
+
+	getWorld()->tryToDamageLocationOrNext(this, getX(), getY());
 }
 
-bool Pea::allowsAgentColocationBy(Actor* a) const
-{
-	return true; // EDIT AS NEEDED BY PEA SPEC
-}
+bool Pea::allowsAgentColocationBy(Actor* a) const { return true; }
 
-  // returns if Actor can be damaged by pea
-bool Pea::isDamageable() const { return true; }
+  // returns if pea can be hit by pea
+bool Pea::isHittable() const { return false; }
 
-  // when attacked by pea, suffer damage
-void Pea::damageBy(int damageAmt)
-{
-	// ADD
-}
+  // when attacked by pea, suffer no damage
+void Pea::damageBy(int damageAmt) {}
 //////////////////////////// PEA CLASS /////////////////////////
 
 //////////////////////////// MARBLE CLASS /////////////////////////
@@ -196,8 +192,8 @@ bool Marble::allowsAgentColocationBy(Actor* a) const
 	return false; // not categorically, but depends on position
 }
 
-  // returns if Marble can be damaged by pea
-bool Marble::isDamageable() const { return true; }
+  // returns if Marble can be hit by pea
+bool Marble::isHittable() const { return true; }
 
   // when attacked by pea, suffer damage
 void Marble::damageBy(int damageAmt)
