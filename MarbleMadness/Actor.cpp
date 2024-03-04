@@ -17,6 +17,8 @@ StudentWorld* Actor::getWorld() const { return myWorld; }
 bool Actor::isAlive() const { return alive; }
   // only true for Crystal
 bool Actor::isCrystal() const { return false;  }
+  // returns true if actor can be stolen by ThiefBot (only true for goodies)
+bool Actor::isStealable() const { return false; }
 void Actor::setDead() { alive = false; }
 void Actor::setHP(int amt) { hitPoints = amt; }
 int Actor::getHP() const { return hitPoints; }
@@ -26,6 +28,7 @@ bool Actor::canContainMarblePush() { return false; }
 bool Actor::mayBePushedByPlayer() { return false; }
   // only allowed for Marbles
 bool Actor::pushTo(int x, int y) { return false; }
+void Actor::changeStealable() {}
 //////////////////////////// ACTOR CLASS /////////////////////////
 
 //////////////////////////// WALL CLASS /////////////////////////
@@ -52,7 +55,7 @@ Avator::Avator(int x, int y, StudentWorld* ptr)
 }
 
 // health percentage
-int Avator::getHealth() const { return 100 * (getHP() / 20); }
+int Avator::getHealth() const { return 100 * (getHP() / 20.); }
 
 void Avator::incAmmo(int amt) { if (amt > 0) numPeas += amt; }
 
@@ -301,8 +304,22 @@ void Exit::damageBy(int damageAmt) {};
 
 //////////////////////////// PICKUPABLEITEM CLASS /////////////////////////
 PickupableItem::PickupableItem(int x, int y, int ID, StudentWorld* ptr)
-	: Actor(ptr, ID, x, y)
+	: Actor(ptr, ID, x, y), canPickUp(true)
 {}
+
+  // returns true if actor can be stolen by ThiefBot
+bool PickupableItem::isStealable() const
+{
+	if (!isCrystal()) 
+		return canPickUp;
+	return false;
+}
+
+void PickupableItem::changeStealable() 
+{ 
+	if (canPickUp) canPickUp = false;
+	else canPickUp = true;
+}
 
 void PickupableItem::doSomething()
 {
@@ -325,7 +342,7 @@ void PickupableItem::damageBy(int damageAmt) {};
 
 bool PickupableItem::allowsAgentColocationBy(Actor* a) const
 {
-	return true; // FIX
+	return canPickUp; // FIX
 }
 //////////////////////////// PICKUPABLEITEM CLASS /////////////////////////
 
@@ -414,12 +431,148 @@ void Robot::damageBy(int damageAmt)
 		getWorld()->playSound(SOUND_ROBOT_IMPACT);
 	else // dead
 	{
+		damageSpecial();
 		setDead();
 		getWorld()->playSound(SOUND_ROBOT_DIE);
-		getWorld()->increaseScore(100);
 	}
 }
 //////////////////////////// ROBOT CLASS /////////////////////////
+
+//////////////////////////// THIEFBOT CLASS /////////////////////////
+ThiefBot::ThiefBot(int x, int y, int ID, StudentWorld* ptr)
+	: Robot(x, y, ID, right, ptr), holding(false), p(nullptr), distMoved(0)
+{
+	setHP(5);
+	distanceBeforeTurning = rand() % 6 + 1;
+	determineNumTicks();
+}
+
+void ThiefBot::act()
+{
+	// if on same square as goodie + does not hold goodie currently
+	p = getWorld()->isGoodieHere(this, getX(), getY());
+	if (p != nullptr && holding == false && (rand() % 10 + 1) == 4) { // 1 in 10 chance TB picks goodie up
+		p->setVisible(false);
+		p->changeStealable();
+		holding = true;
+		getWorld()->playSound(SOUND_ROBOT_MUNCH);
+		return;
+	}
+	// hasn't moved full possible distance in this direction
+	else if (distMoved < distanceBeforeTurning)
+	{
+		double botX = getX();
+		double botY = getY();
+		int botDir = getDirection();
+
+		if (botDir == left && getWorld()->allowsBot(botX - 1, botY))
+		{
+			moveTo(botX - 1, botY);
+			distMoved++;
+			return;
+		}
+		else if (botDir == right && getWorld()->allowsBot(botX + 1, botY))
+		{
+			moveTo(botX + 1, botY);
+			distMoved++;
+			return;
+		}
+		else if (botDir == up && getWorld()->allowsBot(botX, botY + 1))
+		{
+			moveTo(botX, botY + 1);
+			distMoved++;
+			return;
+		}
+		else if (botDir == down && getWorld()->allowsBot(botX, botY - 1))
+		{
+			moveTo(botX, botY - 1);
+			distMoved++;
+			return;
+		}
+	}
+	// already moved the full distance in straight line or encountered obstruction
+	distanceBeforeTurning = rand() % 6 + 1;
+	int d = (rand() % 4) * 90;
+	int dx, dy;
+
+	for (int i = 0; i < 4; i++) { // iterate through all 4 dirs
+		if (d == 0) { dx = 1; dy = 0; }
+		else if (d == 180) { dx = -1; dy = 0; }
+		else if (d == 90) { dx = 0; dy = 1; }
+		else { dx = 0; dy = -1; }
+
+		if (getWorld()->allowsBot(getX() + dx, getY() + dy)) {
+			setDirection(d);
+			moveTo(getX() + dx, getY() + dy);
+			return;
+		}
+		
+		// change dir
+		if (d < 360) d += 90;
+		else d = 0;
+	}
+
+	// obstruction in all 4 directions
+	setDirection(d);
+	return;
+}
+
+void ThiefBot::damageSpecial()
+{
+	// drop goodie
+	p->moveTo(getX(), getY());
+	p->setVisible(true);
+	p->changeStealable();
+
+	getWorld()->increaseScore(10);
+}
+//////////////////////////// THIEFBOT CLASS /////////////////////////
+
+//////////////////////////// MEANTHIEFBOT CLASS /////////////////////////
+MeanThiefBot::MeanThiefBot(int x, int y, StudentWorld* ptr)
+	: ThiefBot(x, y, IID_MEAN_THIEFBOT, ptr)
+{
+	setHP(8);
+}
+
+void MeanThiefBot::act()
+{
+	double playerX = getWorld()->getPlayer()->getX();
+	double playerY = getWorld()->getPlayer()->getY();
+	double botX = getX();
+	double botY = getY();
+	int botDir = getDirection();
+
+	// if should fire pea cannon
+	if (botDir == right && botY == playerY && playerX > botX && getWorld()->existsClearShotToPlayer(botX, botY, 1, 0)
+		|| botDir == left && botY == playerY && playerX < botX && getWorld()->existsClearShotToPlayer(botX, botY, -1, 0)
+		|| botDir == up && botX == playerX && playerY > botY && getWorld()->existsClearShotToPlayer(botX, botY, 0, 1)
+		|| botDir == down && botX == playerX && playerY < botY && getWorld()->existsClearShotToPlayer(botX, botY, 0, -1))
+
+	{
+		// create new pea with temp location of bot
+		Pea* pea = new Pea(botX, botY, getWorld(), botDir);
+
+		// adjust position to directly in front of bot
+		if (botDir == left) pea->moveTo(botX - 1, botY);
+		else if (botDir == right) pea->moveTo(botX + 1, botY);
+		else if (botDir == up) pea->moveTo(botX, botY + 1);
+		else if (botDir == down) pea->moveTo(botX, botY - 1);
+		else cerr << "bot's direction is none, cannot fire pea";
+
+		getWorld()->addActor(pea); // add to actors array
+		getWorld()->playSound(SOUND_ENEMY_FIRE); // sound
+		return;
+	}
+	else ThiefBot::act();
+}
+
+void MeanThiefBot::damageSpecial()
+{
+	ThiefBot::damageSpecial();
+	getWorld()->increaseScore(10); // increase score a total of 20 points
+}
+//////////////////////////// MEANTHIEFBOT CLASS /////////////////////////
 
 //////////////////////////// RAGEBOT CLASS /////////////////////////
 RageBot::RageBot(int x, int y, int dir, StudentWorld* ptr)
@@ -427,6 +580,11 @@ RageBot::RageBot(int x, int y, int dir, StudentWorld* ptr)
 {
 	setHP(10);
 	determineNumTicks();
+}
+
+void RageBot::damageSpecial()
+{
+	getWorld()->increaseScore(100);
 }
 
 void RageBot::act()
@@ -456,6 +614,8 @@ void RageBot::act()
 
 		getWorld()->addActor(p); // add to actors array
 		getWorld()->playSound(SOUND_ENEMY_FIRE); // sound
+
+		return;
 	}
 	else // didn't fire, tries to move
 	{
@@ -473,3 +633,22 @@ void RageBot::act()
 			
 }
 //////////////////////////// RAGEBOT CLASS /////////////////////////
+
+//////////////////////////// THIEFBOTFACTORY CLASS /////////////////////////
+ThiefBotFactory::ThiefBotFactory(int x, int y, StudentWorld* ptr, bool mean)
+	: Actor(ptr, IID_ROBOT_FACTORY, x, y), ifMean(mean)
+{}
+
+void ThiefBotFactory::doSomething()
+{
+	
+}
+
+bool ThiefBotFactory::allowsAgentColocationBy(Actor* a) const { return false; }
+
+  // returns if Actor can be hit by pea
+bool ThiefBotFactory::isHittable() const { return true; }
+  // when attacked by pea, suffer no damage
+void ThiefBotFactory::damageBy(int damageAmt) {}
+
+//////////////////////////// THIEFBOTFACTORY CLASS /////////////////////////

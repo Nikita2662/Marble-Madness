@@ -42,6 +42,8 @@ public:
     bool existsClearShotToPlayer(int x, int y, int dx, int dy) const;
 	  // returns if bot is allowed to move to this position
 	bool allowsBot(int x, int y) const;
+	  // returns pointer to goodie if ThiefBot is on the same square as a goodie
+	Actor* isGoodieHere(Actor* a, int thiefX, int thiefY) const;
 
 
 private:

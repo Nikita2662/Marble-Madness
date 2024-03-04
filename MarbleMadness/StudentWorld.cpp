@@ -135,6 +135,15 @@ bool StudentWorld::isPlayerHere(int x, int y) const
     return false;
 }
 
+  // returns pointer to goodie if ThiefBot is on the same square as a goodie
+Actor* StudentWorld::isGoodieHere(Actor* a, int thiefX, int thiefY) const
+{
+    for (size_t i = 0; i < actors.size(); i++) // iterate through actors by index
+        if (actors[i]->getX() == thiefX && actors[i]->getY() == thiefY && actors[i]->isStealable())
+            return actors[i];
+    return nullptr;
+}
+
   // update score/lives/level text at screen time
 void StudentWorld::updateDisplayText()
 {
@@ -256,8 +265,17 @@ int StudentWorld::init()
                 break;
             }
             case Level::thiefbot_factory:
-            case Level::mean_thiefbot_factory:
+            {
+                ThiefBotFactory* tbf = new ThiefBotFactory(i, j, this, false);
+                addActor(tbf);
                 break;
+            }
+            case Level::mean_thiefbot_factory:
+            {
+                ThiefBotFactory* tbf = new ThiefBotFactory(i, j, this, true);
+                addActor(tbf);
+                break;
+            }
             default:
                 cerr << "Invalid entry in maze text file";
             }

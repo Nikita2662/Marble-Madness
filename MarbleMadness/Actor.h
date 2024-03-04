@@ -26,8 +26,11 @@ public:
 	virtual bool allowsAgentColocationBy(Actor* a) const = 0;
 	  // returns if Actor can be hit by pea
 	virtual bool isHittable() const = 0;
+	  // returns true if actor can be stolen by ThiefBot
+	virtual bool isStealable() const;
 	  // when attacked by pea, suffer damage
 	virtual void damageBy(int damageAmt) = 0;
+	virtual void changeStealable();
 private:
 	StudentWorld* myWorld;
 	bool alive;
@@ -129,13 +132,18 @@ class PickupableItem : public Actor
 {
 public:
 	PickupableItem(int x, int y, int ID, StudentWorld* ptr);
+	virtual void changeStealable();
 	virtual void specialized() = 0;
 	virtual void doSomething();
+	  // returns true if actor can be stolen by ThiefBot (only Goodies)
+	virtual bool isStealable() const;
 	virtual bool allowsAgentColocationBy(Actor* a) const;
 	  // returns if Actor can be hit by pea
 	virtual bool isHittable() const;
 	  // when attacked by pea, suffer damage
 	virtual void damageBy(int damageAmt);
+private:
+	bool canPickUp;
 };
 
 class Crystal : public PickupableItem
@@ -182,6 +190,7 @@ public:
 	virtual bool isHittable() const;
 	  // when attacked by pea, suffer damage
 	virtual void damageBy(int damageAmt);
+	virtual void damageSpecial() = 0;
 private:
 	int tickCount;
 	int numTicks;
@@ -192,5 +201,41 @@ class RageBot : public Robot
 public:
 	RageBot(int x, int y, int dir, StudentWorld* ptr);
 	virtual void act();
+	virtual void damageSpecial();
+};
+
+class ThiefBot : public Robot
+{
+public:
+	ThiefBot(int x, int y, int ID, StudentWorld* ptr);
+	virtual void act();
+	virtual void damageSpecial();
+private:
+	int distanceBeforeTurning;
+	bool holding;
+	Actor* p;
+	int distMoved;
+};
+
+class MeanThiefBot : public ThiefBot
+{
+public:
+	MeanThiefBot(int x, int y, StudentWorld* ptr);
+	virtual void act();
+	virtual void damageSpecial();
+};
+
+class ThiefBotFactory : public Actor
+{
+public:
+	ThiefBotFactory(int x, int y, StudentWorld* ptr, bool mean);
+	virtual void doSomething();
+	virtual bool allowsAgentColocationBy(Actor* a) const;
+	  // returns if TBF can be hit by pea
+	virtual bool isHittable() const;
+	  // when attacked by pea, suffer damage
+	virtual void damageBy(int damageAmt);
+private:
+	bool ifMean;
 };
 #endif // ACTOR_H_
