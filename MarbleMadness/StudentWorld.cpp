@@ -19,6 +19,8 @@ StudentWorld::~StudentWorld() { cleanUp(); }
   // assuming not avator, adds actor to array
 void StudentWorld::addActor(Actor* a) { actors.push_back(a);  }
 
+Actor* StudentWorld::getPlayer() { return player; }
+
 void StudentWorld::completeLevel() { levelCompleted = true; }
 
 bool StudentWorld::allCrystalsCollected() const
@@ -32,6 +34,31 @@ bool StudentWorld::allCrystalsCollected() const
 void StudentWorld::restorePlayerToFullHealth() { player->setHP(20); }
 
 void StudentWorld::addAmmoToPlayer(int amt) { player->incAmmo(amt); }
+
+  /* If a pea were at x, y moving in direction dx, dy, could it hit the
+       player without encountering any obstructions? */
+bool StudentWorld::existsClearShotToPlayer(int x, int y, int dx, int dy) const
+{
+    for (size_t i = 0; i < actors.size(); i++) // iterate through actors by index
+        if (actors[i]->getX() == (x + dx) && actors[i]->getY() == (y + dy)) { // if there is an actor at the "next" position
+            if (actors[i] == player) // if the actor in the "next" position IS the player
+                return true;
+            if (actors[i]->isHittable())  // if this actor will be an obstacle
+                return false;
+        } 
+    return existsClearShotToPlayer(x+dx, y+dy, dx, dy);
+}
+
+  // returns if bot is allowed to move to this position
+bool StudentWorld::allowsBot(int x, int y) const
+{
+    for (size_t i = 0; i < actors.size(); i++) // iterate through actors by index
+        if (actors[i]->getX() == x && actors[i]->getY() == y) { // if any actor at that position
+            if (actors[i]->isHittable() || actors[i]->canContainMarblePush()) // hittable or Pit
+                return false;
+        }
+    return true;
+}
 
   // check if the provided Actor can move to the provided position
 bool StudentWorld::canActorMoveHere(Actor* a, int x, int y) const
@@ -217,7 +244,17 @@ int StudentWorld::init()
                 break;
             }
             case Level::horiz_ragebot:
+            {
+                RageBot* r = new RageBot(i, j, GraphObject::right, this);
+                addActor(r);
+                break;
+            }
             case Level::vert_ragebot:
+            {
+                RageBot* r = new RageBot(i, j, GraphObject::down, this);
+                addActor(r);
+                break;
+            }
             case Level::thiefbot_factory:
             case Level::mean_thiefbot_factory:
                 break;

@@ -33,9 +33,16 @@ public:
 	Actor* isMarbleHere(Actor* a, int pitX, int pitY) const;
 	  // if avator is on the same square as the provided position, returns true. (otherwise, false)
 	bool isPlayerHere(int x, int y) const;
+	Actor* getPlayer();
 	bool allCrystalsCollected() const;
 	void restorePlayerToFullHealth();
 	void addAmmoToPlayer(int amt);
+	  /* If a pea were at x, y moving in direction dx, dy, could it hit the
+         player without encountering any obstructions? */
+    bool existsClearShotToPlayer(int x, int y, int dx, int dy) const;
+	  // returns if bot is allowed to move to this position
+	bool allowsBot(int x, int y) const;
+
 
 private:
 	  // update score/lives/level text at screen time

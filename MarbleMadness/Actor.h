@@ -167,4 +167,30 @@ public:
 	AmmoGoodie(int x, int y, StudentWorld* ptr);
 	virtual void specialized();
 };
+
+class Robot : public Actor
+{
+public:
+	Robot(int x, int y, int ID, int dir, StudentWorld* ptr);
+	void determineNumTicks();
+	int getTickCount();
+	int getNumTicks();
+	virtual void act() = 0;
+	virtual void doSomething();
+	virtual bool allowsAgentColocationBy(Actor* a) const;
+	  // returns if Actor can be hit by pea
+	virtual bool isHittable() const;
+	  // when attacked by pea, suffer damage
+	virtual void damageBy(int damageAmt);
+private:
+	int tickCount;
+	int numTicks;
+};
+
+class RageBot : public Robot
+{
+public:
+	RageBot(int x, int y, int dir, StudentWorld* ptr);
+	virtual void act();
+};
 #endif // ACTOR_H_

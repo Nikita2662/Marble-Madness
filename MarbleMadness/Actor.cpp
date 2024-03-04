@@ -378,3 +378,98 @@ void AmmoGoodie::specialized()
 	getWorld()->addAmmoToPlayer(20);
 }
 //////////////////////////// AMMMOGOODIE CLASS /////////////////////////
+
+//////////////////////////// ROBOT CLASS /////////////////////////
+Robot::Robot(int x, int y, int ID, int dir, StudentWorld* ptr)
+	: Actor(ptr, ID, x, y, dir), tickCount(0), numTicks(-1)
+{}
+
+void Robot::doSomething()
+{
+	if (!isAlive()) return;
+
+	tickCount++; 
+	if (tickCount % numTicks != 0) return; // rest
+	
+	act(); // otherwise, act - specialized
+}
+
+void Robot::determineNumTicks()
+{
+	numTicks = (28 - getWorld()->getLevel()) / 4;
+	if (numTicks < 3) numTicks = 3; // no Robot moves faster than this
+}
+
+int Robot::getTickCount() { return tickCount; }
+int Robot::getNumTicks() { return numTicks; }
+
+bool Robot::allowsAgentColocationBy(Actor* a) const { return false; }
+  // returns if Actor can be hit by pea
+bool Robot::isHittable() const { return true; }
+  // when attacked by pea, suffer damage
+void Robot::damageBy(int damageAmt) 
+{ 
+	setHP(getHP() - damageAmt);
+	if (getHP() > 0)
+		getWorld()->playSound(SOUND_ROBOT_IMPACT);
+	else // dead
+	{
+		setDead();
+		getWorld()->playSound(SOUND_ROBOT_DIE);
+		getWorld()->increaseScore(100);
+	}
+}
+//////////////////////////// ROBOT CLASS /////////////////////////
+
+//////////////////////////// RAGEBOT CLASS /////////////////////////
+RageBot::RageBot(int x, int y, int dir, StudentWorld* ptr)
+	: Robot(x, y, IID_RAGEBOT, dir, ptr)
+{
+	setHP(10);
+	determineNumTicks();
+}
+
+void RageBot::act()
+{
+	double playerX = getWorld()->getPlayer()->getX();
+	double playerY = getWorld()->getPlayer()->getY();
+	double botX = getX();
+	double botY = getY();
+	int botDir = getDirection();
+
+	// if should fire pea cannon
+	if (botDir == right && botY == playerY && playerX > botX && getWorld()->existsClearShotToPlayer(botX, botY, 1, 0)
+		|| botDir == left && botY == playerY && playerX < botX && getWorld()->existsClearShotToPlayer(botX, botY, -1, 0)
+		|| botDir == up && botX == playerX && playerY > botY && getWorld()->existsClearShotToPlayer(botX, botY, 0, 1)
+		|| botDir == down && botX == playerX && playerY < botY && getWorld()->existsClearShotToPlayer(botX, botY, 0, -1))
+
+	{
+		// create new pea with temp location of bot
+		Pea* p = new Pea(botX, botY, getWorld(), botDir);
+
+		// adjust position to directly in front of bot
+		if (botDir == left) p->moveTo(botX - 1, botY);
+		else if (botDir == right) p->moveTo(botX + 1, botY);
+		else if (botDir == up) p->moveTo(botX, botY + 1);
+		else if (botDir == down) p->moveTo(botX, botY - 1);
+		else cerr << "bot's direction is none, cannot fire pea";
+
+		getWorld()->addActor(p); // add to actors array
+		getWorld()->playSound(SOUND_ENEMY_FIRE); // sound
+	}
+	else // didn't fire, tries to move
+	{
+		if (botDir == left && getWorld()->allowsBot(botX - 1, botY))
+			moveTo(botX - 1, botY);
+		else if (botDir == right && getWorld()->allowsBot(botX + 1, botY))
+			moveTo(botX + 1, botY);
+		else if (botDir == up && getWorld()->allowsBot(botX, botY + 1))
+			moveTo(botX, botY + 1);
+		else if (botDir == down && getWorld()->allowsBot(botX, botY - 1))
+			moveTo(botX, botY - 1);
+		else
+			setDirection(botDir - 180);
+	}
+			
+}
+//////////////////////////// RAGEBOT CLASS /////////////////////////
