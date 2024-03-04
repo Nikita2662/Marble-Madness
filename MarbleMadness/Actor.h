@@ -22,6 +22,7 @@ public:
 	virtual bool mayBePushedByPlayer();
 	  // avator pushes Marble to given position if possible, returns false otherwise
 	virtual bool pushTo(int x, int y);
+	virtual bool isCrystal() const;
 	virtual bool allowsAgentColocationBy(Actor* a) const = 0;
 	  // returns if Actor can be hit by pea
 	virtual bool isHittable() const = 0;
@@ -109,6 +110,20 @@ public:
 private:
 };
 
+class Exit : public Actor
+{
+public:
+	Exit(int x, int y, StudentWorld* ptr);
+	virtual void doSomething();
+	virtual bool allowsAgentColocationBy(Actor* a) const;
+	  // returns if Actor can be hit by pea
+	virtual bool isHittable() const;
+	  // when attacked by pea, suffer damage
+	virtual void damageBy(int damageAmt);
+
+private:
+};
+
 class PickupableItem : public Actor
 {
 public:
@@ -127,5 +142,7 @@ class Crystal : public PickupableItem
 public:
 	Crystal(int x, int y, StudentWorld* ptr);
 	virtual void specialized();
+	  // only true for Crystal
+	virtual bool Crystal::isCrystal() const;
 };
 #endif // ACTOR_H_

@@ -15,6 +15,8 @@ Actor::~Actor() {}
 StudentWorld* Actor::getWorld() const { return myWorld; }
 
 bool Actor::isAlive() const { return alive; }
+  // only true for Crystal
+bool Actor::isCrystal() const { return false;  }
 void Actor::setDead() { alive = false; }
 void Actor::setHP(int amt) { hitPoints = amt; }
 int Actor::getHP() const { return hitPoints; }
@@ -260,6 +262,41 @@ bool Pit::isHittable() const { return false; }
 void Pit::damageBy(int damageAmt) {};
 //////////////////////////// PIT CLASS /////////////////////////
 
+//////////////////////////// EXIT CLASS /////////////////////////
+Exit::Exit(int x, int y, StudentWorld* ptr)
+	: Actor(ptr, IID_EXIT, x, y)
+{
+	setVisible(false);
+}
+
+void Exit::doSomething()
+{
+	// if player is currently on same square as exit and exit is visible (all crystals collected)
+	if (isVisible() && getWorld()->isPlayerHere(getX(), getY()))
+	{
+		getWorld()->playSound(SOUND_FINISHED_LEVEL);
+		getWorld()->increaseScore(2000);
+		getWorld()->completeLevel();
+	}
+
+	// if all crystals collected and exit invisible, TRANSITION to visible
+	else if (!isVisible() && getWorld()->allCrystalsCollected())
+	{
+		setVisible(true);
+		getWorld()->playSound(SOUND_REVEAL_EXIT);
+	}
+}
+bool Exit::allowsAgentColocationBy(Actor* a) const
+{
+	return true; // FIX
+}
+
+// returns if Exit can be hit by pea
+bool Exit::isHittable() const { return false; }
+// when attacked by pea, suffer no damage
+void Exit::damageBy(int damageAmt) {};
+//////////////////////////// EXIT CLASS /////////////////////////
+
 //////////////////////////// PICKUPABLEITEM CLASS /////////////////////////
 PickupableItem::PickupableItem(int x, int y, int ID, StudentWorld* ptr)
 	: Actor(ptr, ID, x, y)
@@ -270,14 +307,13 @@ void PickupableItem::doSomething()
 	// check if alive
 	if (!isAlive()) return;
 
-	// if player is on same square as the pickupable item
+	// if player is on same square as the pickupable item, pick it up
 	if (getWorld()->isPlayerHere(getX(), getY()))
 	{
 		specialized();
 		setDead();
 		getWorld()->playSound(SOUND_GOT_GOODIE);
 	}
-		
 }
 
   // returns if Actor can be hit by pea
@@ -301,4 +337,7 @@ void Crystal::specialized()
 {
 	getWorld()->increaseScore(50);
 }
+
+  // only true for Crystal
+bool Crystal::isCrystal() const { return true; }
 //////////////////////////// CRYSTAL CLASS /////////////////////////

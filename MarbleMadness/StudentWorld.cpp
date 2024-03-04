@@ -11,13 +11,23 @@ using namespace std;
 GameWorld* createStudentWorld(string assetPath) { return new StudentWorld(assetPath); }
 
 StudentWorld::StudentWorld(string assetPath)
-    : GameWorld(assetPath), bonus(-1), player(nullptr)
+    : GameWorld(assetPath), bonus(-1), player(nullptr), levelCompleted(false)
 {}
 
 StudentWorld::~StudentWorld() { cleanUp(); }
 
   // assuming not avator, adds actor to array
 void StudentWorld::addActor(Actor* a) { actors.push_back(a);  }
+
+void StudentWorld::completeLevel() { levelCompleted = true; }
+
+bool StudentWorld::allCrystalsCollected()
+{
+    for (size_t i = 0; i < actors.size(); i++) // iterate through actors by index
+        if (actors[i]->isCrystal()) return false; // crystals remaining
+
+    return true; // all collected
+}
 
   // check if the provided Actor can move to the provided position
 bool StudentWorld::canActorMoveHere(Actor* a, int x, int y) const
@@ -115,7 +125,9 @@ void StudentWorld::updateDisplayText()
   // given current level of the GameWorld, loads the maze if possible. populates ACTORS and AVATOR of the game for the current level
 int StudentWorld::init()
 {
-    bonus = 1000; // whenever new level starts
+    // when new level starts
+    bonus = 1000; 
+    levelCompleted = false; 
 
     // ------ convert level to a string so we can access text file
     int l = getLevel();
@@ -177,6 +189,11 @@ int StudentWorld::init()
                 break;
             }
             case Level::exit:
+            {
+                Exit* e = new Exit(i, j, this);
+                addActor(e);
+                break;
+            }
             case Level::horiz_ragebot:
             case Level::vert_ragebot:
             case Level::thiefbot_factory:
@@ -206,7 +223,11 @@ int StudentWorld::move()
             if (!player->isAlive()) // if player died during this tick
                 return GWSTATUS_PLAYER_DIED;
 
-            // ADD HERE
+            if (levelCompleted)
+            {
+                if (bonus > 0) increaseScore(bonus);
+                return GWSTATUS_FINISHED_LEVEL;
+            }
         }  
     }
     // remove newly-dead actors after each tick
@@ -223,6 +244,15 @@ int StudentWorld::move()
 
     // reduce current bonus for level by 1 unless already 0
     if (bonus > 0) bonus--; 
+
+    if (!player->isAlive()) // if player died during this tick
+        return GWSTATUS_PLAYER_DIED;
+
+    if (levelCompleted)
+    {
+        if (bonus > 0) increaseScore(bonus);
+        return GWSTATUS_FINISHED_LEVEL;
+    }
     
 	return GWSTATUS_CONTINUE_GAME;
 }

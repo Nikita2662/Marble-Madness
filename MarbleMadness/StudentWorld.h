@@ -18,6 +18,7 @@ public:
 	virtual int init();
 	virtual int move();
 	virtual void cleanUp();
+	void completeLevel();
 	  /* check if the provided Actor can move to the provided position
 	     if Actor is marble, only allows movement to Pit or Empty
 	     if Actor is agent, movement allowed anywhere but wall, pit, robot, or robotfactory */
@@ -32,6 +33,7 @@ public:
 	Actor* isMarbleHere(Actor* a, int pitX, int pitY);
 	  // if avator is on the same square as the provided position, returns true. (otherwise, false)
 	bool isPlayerHere(int x, int y);
+	bool allCrystalsCollected();
 
 private:
 	  // update score/lives/level text at screen time
@@ -40,6 +42,7 @@ private:
 	std::vector<Actor*> actors; // empty actors vector, 0 elems
 	Avator* player; // pointer to the player object
 	int bonus;
+	bool levelCompleted;
 };
 
 #endif // STUDENTWORLD_H_
