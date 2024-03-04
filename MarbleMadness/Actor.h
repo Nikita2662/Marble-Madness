@@ -52,6 +52,7 @@ class Avator : public Actor
 public:
 	Avator(int x, int y, StudentWorld* ptr);
 	int getHealth() const;
+	void incAmmo(int amt);
 	int getAmmo() const;
 	bool moveIfPossible();
 	virtual void doSomething();
@@ -157,6 +158,13 @@ class RestoreHealthGoodie : public PickupableItem
 {
 public:
 	RestoreHealthGoodie(int x, int y, StudentWorld* ptr);
+	virtual void specialized();
+};
+
+class AmmoGoodie : public PickupableItem
+{
+public:
+	AmmoGoodie(int x, int y, StudentWorld* ptr);
 	virtual void specialized();
 };
 #endif // ACTOR_H_

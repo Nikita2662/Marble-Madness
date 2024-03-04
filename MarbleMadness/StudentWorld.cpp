@@ -29,10 +29,9 @@ bool StudentWorld::allCrystalsCollected() const
     return true; // all collected
 }
 
-void StudentWorld::restorePlayerToFullHealth()
-{
-    player->setHP(20);
-}
+void StudentWorld::restorePlayerToFullHealth() { player->setHP(20); }
+
+void StudentWorld::addAmmoToPlayer(int amt) { player->incAmmo(amt); }
 
   // check if the provided Actor can move to the provided position
 bool StudentWorld::canActorMoveHere(Actor* a, int x, int y) const
@@ -211,11 +210,16 @@ int StudentWorld::init()
                 addActor(rhg);
                 break;
             }
+            case Level::ammo:
+            {
+                AmmoGoodie* ag = new AmmoGoodie(i, j, this);
+                addActor(ag);
+                break;
+            }
             case Level::horiz_ragebot:
             case Level::vert_ragebot:
             case Level::thiefbot_factory:
             case Level::mean_thiefbot_factory:
-            case Level::ammo:
                 break;
             default:
                 cerr << "Invalid entry in maze text file";

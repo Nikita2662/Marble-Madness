@@ -35,6 +35,7 @@ public:
 	bool isPlayerHere(int x, int y) const;
 	bool allCrystalsCollected() const;
 	void restorePlayerToFullHealth();
+	void addAmmoToPlayer(int amt);
 
 private:
 	  // update score/lives/level text at screen time

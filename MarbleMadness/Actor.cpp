@@ -54,6 +54,8 @@ Avator::Avator(int x, int y, StudentWorld* ptr)
 // health percentage
 int Avator::getHealth() const { return 100 * (getHP() / 20); }
 
+void Avator::incAmmo(int amt) { if (amt > 0) numPeas += amt; }
+
 int Avator::getAmmo() const { return numPeas; }
 
 bool Avator::allowsAgentColocationBy(Actor* a) const 
@@ -364,3 +366,15 @@ void RestoreHealthGoodie::specialized()
 	getWorld()->restorePlayerToFullHealth();
 }
 //////////////////////////// RESTOREHEALTHGOODIE CLASS /////////////////////////
+
+//////////////////////////// AMMMOGOODIE CLASS /////////////////////////
+AmmoGoodie::AmmoGoodie(int x, int y, StudentWorld* ptr)
+	: PickupableItem(x, y, IID_AMMO, ptr)
+{}
+
+void AmmoGoodie::specialized()
+{
+	getWorld()->increaseScore(100);
+	getWorld()->addAmmoToPlayer(20);
+}
+//////////////////////////// AMMMOGOODIE CLASS /////////////////////////
