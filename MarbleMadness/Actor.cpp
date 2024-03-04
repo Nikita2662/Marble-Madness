@@ -260,3 +260,45 @@ bool Pit::isHittable() const { return false; }
 void Pit::damageBy(int damageAmt) {};
 //////////////////////////// PIT CLASS /////////////////////////
 
+//////////////////////////// PICKUPABLEITEM CLASS /////////////////////////
+PickupableItem::PickupableItem(int x, int y, int ID, StudentWorld* ptr)
+	: Actor(ptr, ID, x, y)
+{}
+
+void PickupableItem::doSomething()
+{
+	// check if alive
+	if (!isAlive()) return;
+
+	// if player is on same square as the pickupable item
+	if (getWorld()->isPlayerHere(getX(), getY()))
+	{
+		specialized();
+		setDead();
+		getWorld()->playSound(SOUND_GOT_GOODIE);
+	}
+		
+}
+
+  // returns if Actor can be hit by pea
+bool PickupableItem::isHittable() const { return false; }
+
+  // when attacked by pea, suffer no damage
+void PickupableItem::damageBy(int damageAmt) {};
+
+bool PickupableItem::allowsAgentColocationBy(Actor* a) const
+{
+	return true; // FIX
+}
+//////////////////////////// PICKUPABLEITEM CLASS /////////////////////////
+
+//////////////////////////// CRYSTAL CLASS /////////////////////////
+Crystal::Crystal(int x, int y, StudentWorld* ptr)
+	: PickupableItem(x, y, IID_CRYSTAL, ptr)
+{}
+
+void Crystal::specialized()
+{
+	getWorld()->increaseScore(50);
+}
+//////////////////////////// CRYSTAL CLASS /////////////////////////

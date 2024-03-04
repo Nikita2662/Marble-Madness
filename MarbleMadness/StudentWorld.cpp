@@ -87,6 +87,13 @@ Actor* StudentWorld::isMarbleHere(Actor* a, int pitX, int pitY)
     return nullptr;
 }
 
+  // if avator is on the same square as the provided position, returns true. (otherwise, false)
+bool StudentWorld::isPlayerHere(int x, int y)
+{
+    if (player->getX() == x && player->getY() == y) return true;
+    return false;
+}
+
   // update score/lives/level text at screen time
 void StudentWorld::updateDisplayText()
 {
@@ -163,13 +170,18 @@ int StudentWorld::init()
                 addActor(p);
                 break;
             }
+            case Level::crystal:
+            {
+                Crystal* c = new Crystal(i, j, this);
+                addActor(c);
+                break;
+            }
             case Level::exit:
             case Level::horiz_ragebot:
             case Level::vert_ragebot:
             case Level::thiefbot_factory:
             case Level::mean_thiefbot_factory:
             case Level::ammo:
-            case Level::crystal:
             case Level::restore_health:
             case Level::extra_life:
                 break;

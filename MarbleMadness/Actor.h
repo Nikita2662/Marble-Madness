@@ -109,4 +109,23 @@ public:
 private:
 };
 
+class PickupableItem : public Actor
+{
+public:
+	PickupableItem(int x, int y, int ID, StudentWorld* ptr);
+	virtual void specialized() = 0;
+	virtual void doSomething();
+	virtual bool allowsAgentColocationBy(Actor* a) const;
+	  // returns if Actor can be hit by pea
+	virtual bool isHittable() const;
+	  // when attacked by pea, suffer damage
+	virtual void damageBy(int damageAmt);
+};
+
+class Crystal : public PickupableItem
+{
+public:
+	Crystal(int x, int y, StudentWorld* ptr);
+	virtual void specialized();
+};
 #endif // ACTOR_H_
