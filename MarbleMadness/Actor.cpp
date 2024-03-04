@@ -3,6 +3,8 @@
 #include "StudentWorld.h"
 #include "GameConstants.h"
 #include <iostream>
+#include <algorithm>
+#include <iomanip>
 using namespace std;
 
 //////////////////////////// ACTOR CLASS /////////////////////////
@@ -29,6 +31,7 @@ bool Actor::mayBePushedByPlayer() { return false; }
   // only allowed for Marbles
 bool Actor::pushTo(int x, int y) { return false; }
 void Actor::changeStealable() {}
+bool Actor::countsInFactoryCensus() { return false; }
 //////////////////////////// ACTOR CLASS /////////////////////////
 
 //////////////////////////// WALL CLASS /////////////////////////
@@ -438,12 +441,72 @@ void Robot::damageBy(int damageAmt)
 }
 //////////////////////////// ROBOT CLASS /////////////////////////
 
+//////////////////////////// RAGEBOT CLASS /////////////////////////
+RageBot::RageBot(int x, int y, int dir, StudentWorld* ptr)
+	: Robot(x, y, IID_RAGEBOT, dir, ptr)
+{
+	setHP(10);
+	determineNumTicks();
+}
+
+void RageBot::damageSpecial()
+{
+	getWorld()->increaseScore(100);
+}
+
+void RageBot::act()
+{
+	double playerX = getWorld()->getPlayer()->getX();
+	double playerY = getWorld()->getPlayer()->getY();
+	double botX = getX();
+	double botY = getY();
+	int botDir = getDirection();
+
+	// if should fire pea cannon
+	if (botDir == right && botY == playerY && playerX > botX && getWorld()->existsClearShotToPlayer(botX, botY, 1, 0)
+		|| botDir == left && botY == playerY && playerX < botX && getWorld()->existsClearShotToPlayer(botX, botY, -1, 0)
+		|| botDir == up && botX == playerX && playerY > botY && getWorld()->existsClearShotToPlayer(botX, botY, 0, 1)
+		|| botDir == down && botX == playerX && playerY < botY && getWorld()->existsClearShotToPlayer(botX, botY, 0, -1))
+
+	{
+		// create new pea with temp location of bot
+		Pea* p = new Pea(botX, botY, getWorld(), botDir);
+
+		// adjust position to directly in front of bot
+		if (botDir == left) p->moveTo(botX - 1, botY);
+		else if (botDir == right) p->moveTo(botX + 1, botY);
+		else if (botDir == up) p->moveTo(botX, botY + 1);
+		else if (botDir == down) p->moveTo(botX, botY - 1);
+		else cerr << "bot's direction is none, cannot fire pea";
+
+		getWorld()->addActor(p); // add to actors array
+		getWorld()->playSound(SOUND_ENEMY_FIRE); // sound
+
+		return;
+	}
+	else // didn't fire, tries to move
+	{
+		if (botDir == left && getWorld()->allowsBot(botX - 1, botY))
+			moveTo(botX - 1, botY);
+		else if (botDir == right && getWorld()->allowsBot(botX + 1, botY))
+			moveTo(botX + 1, botY);
+		else if (botDir == up && getWorld()->allowsBot(botX, botY + 1))
+			moveTo(botX, botY + 1);
+		else if (botDir == down && getWorld()->allowsBot(botX, botY - 1))
+			moveTo(botX, botY - 1);
+		else
+			setDirection(botDir - 180);
+	}
+
+}
+//////////////////////////// RAGEBOT CLASS /////////////////////////
+
 //////////////////////////// THIEFBOT CLASS /////////////////////////
 ThiefBot::ThiefBot(int x, int y, int ID, StudentWorld* ptr)
 	: Robot(x, y, ID, right, ptr), holding(false), p(nullptr), distMoved(0)
 {
 	setHP(5);
-	distanceBeforeTurning = rand() % 6 + 1;
+	distanceBeforeTurning = randInt(1,6);
 	determineNumTicks();
 }
 
@@ -451,7 +514,7 @@ void ThiefBot::act()
 {
 	// if on same square as goodie + does not hold goodie currently
 	p = getWorld()->isGoodieHere(this, getX(), getY());
-	if (p != nullptr && holding == false && (rand() % 10 + 1) == 4) { // 1 in 10 chance TB picks goodie up
+	if (p != nullptr && holding == false && randInt(1,10) == 4) { // 1 in 10 chance TB picks goodie up
 		p->setVisible(false);
 		p->changeStealable();
 		holding = true;
@@ -517,6 +580,8 @@ void ThiefBot::act()
 	return;
 }
 
+bool ThiefBot::countsInFactoryCensus() { return true; }
+
 void ThiefBot::damageSpecial()
 {
 	// drop goodie
@@ -574,74 +639,23 @@ void MeanThiefBot::damageSpecial()
 }
 //////////////////////////// MEANTHIEFBOT CLASS /////////////////////////
 
-//////////////////////////// RAGEBOT CLASS /////////////////////////
-RageBot::RageBot(int x, int y, int dir, StudentWorld* ptr)
-	: Robot(x, y, IID_RAGEBOT, dir, ptr)
-{
-	setHP(10);
-	determineNumTicks();
-}
-
-void RageBot::damageSpecial()
-{
-	getWorld()->increaseScore(100);
-}
-
-void RageBot::act()
-{
-	double playerX = getWorld()->getPlayer()->getX();
-	double playerY = getWorld()->getPlayer()->getY();
-	double botX = getX();
-	double botY = getY();
-	int botDir = getDirection();
-
-	// if should fire pea cannon
-	if (botDir == right && botY == playerY && playerX > botX && getWorld()->existsClearShotToPlayer(botX, botY, 1, 0)
-		|| botDir == left && botY == playerY && playerX < botX && getWorld()->existsClearShotToPlayer(botX, botY, -1, 0)
-		|| botDir == up && botX == playerX && playerY > botY && getWorld()->existsClearShotToPlayer(botX, botY, 0, 1)
-		|| botDir == down && botX == playerX && playerY < botY && getWorld()->existsClearShotToPlayer(botX, botY, 0, -1))
-
-	{
-		// create new pea with temp location of bot
-		Pea* p = new Pea(botX, botY, getWorld(), botDir);
-
-		// adjust position to directly in front of bot
-		if (botDir == left) p->moveTo(botX - 1, botY);
-		else if (botDir == right) p->moveTo(botX + 1, botY);
-		else if (botDir == up) p->moveTo(botX, botY + 1);
-		else if (botDir == down) p->moveTo(botX, botY - 1);
-		else cerr << "bot's direction is none, cannot fire pea";
-
-		getWorld()->addActor(p); // add to actors array
-		getWorld()->playSound(SOUND_ENEMY_FIRE); // sound
-
-		return;
-	}
-	else // didn't fire, tries to move
-	{
-		if (botDir == left && getWorld()->allowsBot(botX - 1, botY))
-			moveTo(botX - 1, botY);
-		else if (botDir == right && getWorld()->allowsBot(botX + 1, botY))
-			moveTo(botX + 1, botY);
-		else if (botDir == up && getWorld()->allowsBot(botX, botY + 1))
-			moveTo(botX, botY + 1);
-		else if (botDir == down && getWorld()->allowsBot(botX, botY - 1))
-			moveTo(botX, botY - 1);
-		else
-			setDirection(botDir - 180);
-	}
-			
-}
-//////////////////////////// RAGEBOT CLASS /////////////////////////
-
 //////////////////////////// THIEFBOTFACTORY CLASS /////////////////////////
-ThiefBotFactory::ThiefBotFactory(int x, int y, StudentWorld* ptr, bool mean)
-	: Actor(ptr, IID_ROBOT_FACTORY, x, y), ifMean(mean)
+ThiefBotFactory::ThiefBotFactory(int x, int y, StudentWorld* ptr, int botID)
+	: Actor(ptr, IID_ROBOT_FACTORY, x, y), botID(botID)
 {}
 
 void ThiefBotFactory::doSomething()
 {
-	
+	int count;
+	bool check = getWorld()->doFactoryCensus(getX(), getY(), 3, count);
+
+	if (check && count < 3)
+		if (randInt(1,50) == 5) // 1 in 50 chance that new will be created
+		  {
+			ThiefBot* t = new ThiefBot(getX(), getY(), botID, getWorld());
+			getWorld()->addActor(t);
+			getWorld()->playSound(SOUND_ROBOT_BORN);
+		  }
 }
 
 bool ThiefBotFactory::allowsAgentColocationBy(Actor* a) const { return false; }

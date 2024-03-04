@@ -44,7 +44,13 @@ public:
 	bool allowsBot(int x, int y) const;
 	  // returns pointer to goodie if ThiefBot is on the same square as a goodie
 	Actor* isGoodieHere(Actor* a, int thiefX, int thiefY) const;
-
+		// If a factory is at x,y, how many items of the type that should be
+		// counted are in the rectangle bounded by x-distance,y-distance and
+		// x+distance,y+distance?  Set count to that number and return true,
+		// unless an item is on the factory itself, in which case return false
+		// and don't care about count.  (The items counted are only ever going
+		// ThiefBots.)
+	bool doFactoryCensus(int x, int y, int distance, int& count) const;
 
 private:
 	  // update score/lives/level text at screen time

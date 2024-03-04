@@ -6,6 +6,7 @@
 #include <sstream>
 #include <string>
 #include <iomanip>
+#include <algorithm>
 using namespace std;
 
 GameWorld* createStudentWorld(string assetPath) { return new StudentWorld(assetPath); }
@@ -29,6 +30,38 @@ bool StudentWorld::allCrystalsCollected() const
         if (actors[i]->isCrystal()) return false; // crystals remaining
 
     return true; // all collected
+}
+
+// If a factory is at x,y, how many items of the type that should be
+// counted are in the rectangle bounded by x-distance,y-distance and
+// x+distance,y+distance?  Set count to that number and return true,
+// unless an item is on the factory itself, in which case return false
+// and don't care about count.  (The items counted are only ever going
+// ThiefBots.) [COUNT THIEFBOTS GENERALLY, FOR BOTH]
+bool StudentWorld::doFactoryCensus(int x, int y, int distance, int& count) const
+{
+    count = 0;
+
+    int lowX = x - distance;
+    int highX = x + distance;
+    int lowY = y - distance;
+    int highY = y + distance;
+
+    if (lowX < 0) lowX = 0;
+    if (lowY < 0) lowY = 0;
+    if (highX > (VIEW_WIDTH-1)) highX = VIEW_WIDTH-1;
+    if (highY > (VIEW_HEIGHT-1)) highY = VIEW_HEIGHT-1;
+
+    for (size_t i = 0; i < actors.size(); i++) // iterate through actors by index
+        if (actors[i]->getX() >= lowX && actors[i]->getX() <= highX
+            && actors[i]->getY() >= lowY && actors[i]->getY() <= highY) // if it's in the rectangle
+        {
+            if (actors[i]->getX() == x && actors[i]->getY() == y)
+                return false;
+            if (actors[i]->countsInFactoryCensus()) 
+                count++;
+        }  
+    return true;
 }
 
 void StudentWorld::restorePlayerToFullHealth() { player->setHP(20); }
@@ -266,13 +299,13 @@ int StudentWorld::init()
             }
             case Level::thiefbot_factory:
             {
-                ThiefBotFactory* tbf = new ThiefBotFactory(i, j, this, false);
+                ThiefBotFactory* tbf = new ThiefBotFactory(i, j, this, IID_THIEFBOT);
                 addActor(tbf);
                 break;
             }
             case Level::mean_thiefbot_factory:
             {
-                ThiefBotFactory* tbf = new ThiefBotFactory(i, j, this, true);
+                ThiefBotFactory* tbf = new ThiefBotFactory(i, j, this, IID_MEAN_THIEFBOT);
                 addActor(tbf);
                 break;
             }

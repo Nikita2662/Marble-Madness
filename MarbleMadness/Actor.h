@@ -31,6 +31,7 @@ public:
 	  // when attacked by pea, suffer damage
 	virtual void damageBy(int damageAmt) = 0;
 	virtual void changeStealable();
+	virtual bool countsInFactoryCensus();
 private:
 	StudentWorld* myWorld;
 	bool alive;
@@ -210,6 +211,7 @@ public:
 	ThiefBot(int x, int y, int ID, StudentWorld* ptr);
 	virtual void act();
 	virtual void damageSpecial();
+	virtual bool countsInFactoryCensus();
 private:
 	int distanceBeforeTurning;
 	bool holding;
@@ -228,7 +230,7 @@ public:
 class ThiefBotFactory : public Actor
 {
 public:
-	ThiefBotFactory(int x, int y, StudentWorld* ptr, bool mean);
+	ThiefBotFactory(int x, int y, StudentWorld* ptr, int botID);
 	virtual void doSomething();
 	virtual bool allowsAgentColocationBy(Actor* a) const;
 	  // returns if TBF can be hit by pea
@@ -236,6 +238,6 @@ public:
 	  // when attacked by pea, suffer damage
 	virtual void damageBy(int damageAmt);
 private:
-	bool ifMean;
+	int botID;
 };
 #endif // ACTOR_H_
