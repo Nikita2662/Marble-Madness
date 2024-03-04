@@ -50,7 +50,7 @@ private:
 class Avator : public Actor
 {
 public:
-	Avator(int x, int y, StudentWorld* ptr); // does nothing rn
+	Avator(int x, int y, StudentWorld* ptr);
 	int getHealth() const;
 	int getAmmo() const;
 	bool moveIfPossible();
@@ -143,6 +143,20 @@ public:
 	Crystal(int x, int y, StudentWorld* ptr);
 	virtual void specialized();
 	  // only true for Crystal
-	virtual bool Crystal::isCrystal() const;
+	virtual bool isCrystal() const;
+};
+
+class ExtraLifeGoodie : public PickupableItem
+{
+public:
+	ExtraLifeGoodie(int x, int y, StudentWorld* ptr);
+	virtual void specialized();
+};
+
+class RestoreHealthGoodie : public PickupableItem
+{
+public:
+	RestoreHealthGoodie(int x, int y, StudentWorld* ptr);
+	virtual void specialized();
 };
 #endif // ACTOR_H_

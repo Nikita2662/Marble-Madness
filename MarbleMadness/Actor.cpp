@@ -318,7 +318,6 @@ void PickupableItem::doSomething()
 
   // returns if Actor can be hit by pea
 bool PickupableItem::isHittable() const { return false; }
-
   // when attacked by pea, suffer no damage
 void PickupableItem::damageBy(int damageAmt) {};
 
@@ -341,3 +340,27 @@ void Crystal::specialized()
   // only true for Crystal
 bool Crystal::isCrystal() const { return true; }
 //////////////////////////// CRYSTAL CLASS /////////////////////////
+
+//////////////////////////// EXTRALIFEGOODIE CLASS /////////////////////////
+ExtraLifeGoodie::ExtraLifeGoodie(int x, int y, StudentWorld* ptr)
+	: PickupableItem(x, y, IID_EXTRA_LIFE, ptr)
+{}
+
+void ExtraLifeGoodie::specialized()
+{
+	getWorld()->increaseScore(1000);
+	getWorld()->incLives();
+}
+//////////////////////////// EXTRALIFEGOODIE CLASS /////////////////////////
+
+//////////////////////////// RESTOREHEALTHGOODIE CLASS /////////////////////////
+RestoreHealthGoodie::RestoreHealthGoodie(int x, int y, StudentWorld* ptr)
+	: PickupableItem(x, y, IID_RESTORE_HEALTH, ptr)
+{}
+
+void RestoreHealthGoodie::specialized()
+{
+	getWorld()->increaseScore(500);
+	getWorld()->restorePlayerToFullHealth();
+}
+//////////////////////////// RESTOREHEALTHGOODIE CLASS /////////////////////////

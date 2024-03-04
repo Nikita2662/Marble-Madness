@@ -21,12 +21,17 @@ void StudentWorld::addActor(Actor* a) { actors.push_back(a);  }
 
 void StudentWorld::completeLevel() { levelCompleted = true; }
 
-bool StudentWorld::allCrystalsCollected()
+bool StudentWorld::allCrystalsCollected() const
 {
     for (size_t i = 0; i < actors.size(); i++) // iterate through actors by index
         if (actors[i]->isCrystal()) return false; // crystals remaining
 
     return true; // all collected
+}
+
+void StudentWorld::restorePlayerToFullHealth()
+{
+    player->setHP(20);
 }
 
   // check if the provided Actor can move to the provided position
@@ -89,7 +94,7 @@ bool StudentWorld::tryToDamageLocation(Actor* a, int peaX, int peaY)
 }
 
   // returns if marble is on the same square as a pit
-Actor* StudentWorld::isMarbleHere(Actor* a, int pitX, int pitY)
+Actor* StudentWorld::isMarbleHere(Actor* a, int pitX, int pitY) const
 {
     for (size_t i = 0; i < actors.size(); i++) // iterate through actors by index
         if (actors[i]->getX() == pitX && actors[i]->getY() == pitY && actors[i]->mayBePushedByPlayer())
@@ -98,7 +103,7 @@ Actor* StudentWorld::isMarbleHere(Actor* a, int pitX, int pitY)
 }
 
   // if avator is on the same square as the provided position, returns true. (otherwise, false)
-bool StudentWorld::isPlayerHere(int x, int y)
+bool StudentWorld::isPlayerHere(int x, int y) const
 {
     if (player->getX() == x && player->getY() == y) return true;
     return false;
@@ -194,13 +199,23 @@ int StudentWorld::init()
                 addActor(e);
                 break;
             }
+            case Level::extra_life:
+            {
+                ExtraLifeGoodie* elg = new ExtraLifeGoodie(i, j, this);
+                addActor(elg);
+                break;
+            }
+            case Level::restore_health:
+            {
+                RestoreHealthGoodie* rhg = new RestoreHealthGoodie(i, j, this);
+                addActor(rhg);
+                break;
+            }
             case Level::horiz_ragebot:
             case Level::vert_ragebot:
             case Level::thiefbot_factory:
             case Level::mean_thiefbot_factory:
             case Level::ammo:
-            case Level::restore_health:
-            case Level::extra_life:
                 break;
             default:
                 cerr << "Invalid entry in maze text file";

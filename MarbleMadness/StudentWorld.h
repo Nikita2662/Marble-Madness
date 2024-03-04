@@ -30,10 +30,11 @@ public:
 	  // pea will call this to try to damage any objects at its current location
 	bool tryToDamageLocation(Actor* a, int peaX, int peaY);
 	  // if marble is on the same square as a pit, returns a pointer to it (otherwise, nullptr)
-	Actor* isMarbleHere(Actor* a, int pitX, int pitY);
+	Actor* isMarbleHere(Actor* a, int pitX, int pitY) const;
 	  // if avator is on the same square as the provided position, returns true. (otherwise, false)
-	bool isPlayerHere(int x, int y);
-	bool allCrystalsCollected();
+	bool isPlayerHere(int x, int y) const;
+	bool allCrystalsCollected() const;
+	void restorePlayerToFullHealth();
 
 private:
 	  // update score/lives/level text at screen time

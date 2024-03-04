@@ -20,7 +20,7 @@ C:\Nikita\College\CS32\MarbleMadness\MarbleMadness\Actor.cpp(275,50): warning C4
 C:\Nikita\College\CS32\MarbleMadness\MarbleMadness\Actor.cpp(311,43): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
 C:\Nikita\College\CS32\MarbleMadness\MarbleMadness\Actor.cpp(311,35): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
   StudentWorld.cpp
-C:\Nikita\College\CS32\MarbleMadness\MarbleMadness\StudentWorld.cpp(40,24): warning C4244: 'initializing': conversion from 'double' to 'int', possible loss of data
-C:\Nikita\College\CS32\MarbleMadness\MarbleMadness\StudentWorld.cpp(41,24): warning C4244: 'initializing': conversion from 'double' to 'int', possible loss of data
+C:\Nikita\College\CS32\MarbleMadness\MarbleMadness\StudentWorld.cpp(45,24): warning C4244: 'initializing': conversion from 'double' to 'int', possible loss of data
+C:\Nikita\College\CS32\MarbleMadness\MarbleMadness\StudentWorld.cpp(46,24): warning C4244: 'initializing': conversion from 'double' to 'int', possible loss of data
   Generating Code...
   MarbleMadness.vcxproj -> C:\Nikita\College\CS32\MarbleMadness\Debug\MarbleMadness.exe
